@@ -1,0 +1,17 @@
+AgriFollower / rosorin_sim_ws
+Copyright 2026 AgriFollower / rosorin_sim_ws contributors
+
+This product includes software developed for the AgriFollower project,
+licensed under the Apache License, Version 2.0 (see LICENSE).
+
+------------------------------------------------------------------------
+Third-party code NOT included in this repository
+------------------------------------------------------------------------
+
+The manufacturer (Hiwonder) ROSOrin simulation monorepo — expected at
+`src/simulations/` (packages `robot_gazebo`, `rosorin_description`) — is
+NOT distributed as part of this repository. It is third-party code whose
+license is not declared by the manufacturer, so it is not redistributed
+here. Obtain it separately from the manufacturer's `simulations.zip`
+(see README.md "제조사 코드 & 에셋"). Its rights remain with Hiwonder and
+the Apache-2.0 license above does NOT apply to it.
