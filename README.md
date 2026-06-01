@@ -1,5 +1,12 @@
 # rosorin_sim_ws — AgriFollower Simulation Workspace
 
+<p align="center">
+  <img src="assets/main_image.png" alt="Ignition Gazebo 온실 시뮬레이션: 토마토 줄 사이를 주행하는 ROSOrin Mecanum(좌)과 RViz 센서 뷰(우)" width="100%">
+</p>
+<p align="center">
+  <sub>Ignition Gazebo 온실 시뮬레이션 — 토마토 줄 사이를 주행하는 ROSOrin Mecanum(좌)과 RViz 센서 뷰(우)</sub>
+</p>
+
 > **AgriFollower** 프로젝트의 일환.
 > AgriFollower는 온실에서 수확 작업자를 따라다니며 수확물을 운반해 작업 피로를 줄이는
 > **수확 보조 자율 운반 로봇**을 만드는 프로젝트다. 이 저장소는 그중 **시뮬레이션 + 강화학습(RL) 워크스페이스**로,

@@ -2,7 +2,18 @@
 
 ROSOrin(매카넘) **Ignition Gazebo 시뮬 + 강화학습** 워크스페이스. 목표는 온실에서 **작업자(타겟) 추종** 주행 정책 학습.
 프로젝트 개요·환경·실행법은 `README.md`, RL 설계는 `docs/0_project_proposal.md`가 단일 출처다.
-(이 파일은 가볍게 유지 — 상세는 아래 위치를 그때그때 참조할 것.)
+(이 파일은 가볍게 유지 — 상세 절차/배경은 아래 "어디에 뭐가 있나"의 위치를 그때그때 참조할 것.)
+
+## 개발 환경 & 버전 (코드/명령 생성 전 기준값)
+| 항목 | 값 |
+|------|-----|
+| 시뮬레이터 | **Ignition Gazebo Fortress 6.x** (Gazebo Classic 아님) · 렌더 `ogre2`(GPU) |
+| OS / 미들웨어 | Ubuntu 22.04 · **ROS 2 Humble** · Python 3.10 |
+| 빌드 | `colcon build --symlink-install` |
+| 실행 환경 | Docker 컨테이너 `nvidia-egl-desktop-ros2:humble` · GPU 가속 · noVNC(`:6080`) |
+| 로봇 | ROSOrin Mecanum (4 매카넘 휠, 3-DOF 홀로노믹) |
+| 센서 | 2D LiDAR `MS200` · RGB 카메라 `aurora` · IMU (구성은 루트 `.typerc`로 결정) |
+| RL 스택(예정) | Gymnasium + Stable-Baselines3 (SAC 1순위 / PPO 베이스라인) |
 
 ## 반드시 지킬 것 (invariants)
 - **Ignition Gazebo Fortress 전용.** Gazebo Classic 문법(`gazebo_ros`, `spawn_entity.py`, OGRE `.material`, `GAZEBO_RESOURCE_PATH`, `/reset_world`)을 섞지 말 것.
