@@ -49,10 +49,10 @@ def launch_setup(context):
                         'launch', 'ign_gazebo.launch.py')),
         launch_arguments=[('ign_args', [' -r ' + world])])
 
-    # 로봇 스폰 (robot_gazebo 재사용)
+    # 로봇 스폰 (스케일된 xacro 사용 — 이 패키지 런치)
     spawn_model_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(robot_gazebo_share, 'launch', 'spwan_model.launch.py')),
+            os.path.join(greenhouse_share, 'launch', 'spawn_scaled_model.launch.py')),
         launch_arguments={
             'moveit_unite': moveit_unite,
             'use_sim_time': use_sim_time,

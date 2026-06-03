@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  robot_scaled.gazebo.xacro — top-level entry point for the uniformly scaled robot.
+  Fork of src/simulations/robot_gazebo/urdf/robot.gazebo.xacro (vendor, do-not-modify).
+
+  This is the SINGLE place the scale factor is defined. To change the robot size,
+  edit ${S} below. Unscaled robot length (X, front-back) ~0.2737 m; S=1.83 sizes
+  the length to ~0.50 m (width incl. wheels then ~0.375 m) — chosen so the robot
+  is not too long for the 0.8 m greenhouse aisle.
+
+  Sensor intrinsics (LiDAR range/FOV/resolution, camera FOV/resolution) are NOT
+  scaled — they model the real MS200 / aurora hardware — so the vendor
+  lidar/camera gazebo files are included unchanged. Only the geometry (meshes,
+  mounts, wheels, inertia) and the drive plugin parameters are scaled.
+-->
+<robot name="robot" xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:arg name="sim_ign" default="true"/>
+
+    <!-- ====== uniform scale factor (only knob to change robot size) ====== -->
+    <!-- 0.5 m / 0.2737 m(미가공 길이) ≈ 1.83 → 세로 길이 ~0.50 m -->
+    <xacro:property name="S" value="1.83"/>
+
+    <!-- robot_description (scaled fork) -->
+    <xacro:include filename="$(find greenhouse_sim)/urdf/rosorin_scaled.xacro"/>
+
+    <xacro:if value="$(arg sim_ign)">
+        <xacro:include filename="$(find greenhouse_sim)/urdf/wheel_scaled.xacro"/>
+    </xacro:if>
+
+    <!-- lidar (vendor intrinsics, unchanged — same lidar_frame name) -->
+    <xacro:include filename="$(find robot_gazebo)/urdf/lidar.gazebo.xacro"/>
+    <!-- camera (vendor intrinsics, unchanged — same camera_link0 name) -->
+    <xacro:include filename="$(find robot_gazebo)/urdf/camera.gazebo.xacro"/>
+
+    <gazebo>
+        <!-- NOTE: 제조사 robot.gazebo.xacro 에 있던 ign_ros2_control 플러그인은 제거했다.
+             URDF 에 <ros2_control> 태그가 없어 "plugin not active" 에러만 내고 비활성이며,
+             구동은 아래 MecanumDrive 가 담당한다. ros2_control 을 쓰려면 <ros2_control>
+             하드웨어 태그를 추가한 뒤 이 플러그인을 되살릴 것. -->
+
+        <!-- joint -->
+        <plugin filename="libignition-gazebo-joint-state-publisher-system.so" name="ignition::gazebo::systems::JointStatePublisher">
+            <topic>joint_states</topic>
+        </plugin>
+
+        <!-- sensor-liar -->
+        <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors">
+            <render_engine>ogre2</render_engine>
+        </plugin>
+
+        <!-- imu -->
+        <plugin filename="ignition-gazebo-imu-system" name="ignition::gazebo::systems::Imu"></plugin>
+
+        <!-- odom -->
+        <plugin
+            filename="ignition-gazebo-odometry-publisher-system"
+            name="ignition::gazebo::systems::OdometryPublisher">
+            <odom_publish_frequency>50</odom_publish_frequency>
+            <odom_topic>/odom</odom_topic>
+            <odom_frame>odom</odom_frame>
+            <robot_base_frame>base_footprint</robot_base_frame>
+            <tf_topic>/odom/tf</tf_topic>
+        </plugin>
+
+    <!-- MecanumDrive: parameters set to the SCALED ACTUAL geometry.
+         (Vendor used 0.34/0.3/0.05, which did not match the real wheel layout
+         of track=0.18 / wheelbase=0.16 / radius=0.04. Fixed here while scaling.
+         To preserve the exact vendor motion response instead, use
+         0.34*S / 0.3*S / 0.05*S.) -->
+    <plugin filename="ignition-gazebo-mecanum-drive-system" name="ignition::gazebo::systems::MecanumDrive">
+        <front_left_joint>front_left_joint</front_left_joint>
+        <front_right_joint>front_right_joint</front_right_joint>
+        <back_left_joint>rear_left_joint</back_left_joint>
+        <back_right_joint>rear_right_joint</back_right_joint>
+        <wheel_separation>${0.18*S}</wheel_separation>
+        <wheelbase>${0.16*S}</wheelbase>
+        <wheel_radius>${0.04*S}</wheel_radius>
+	<topic>/controller/cmd_vel</topic>
+        <odom_topic>/odom</odom_topic>
+        <frame_id>odom</frame_id>
+        <child_frame_id>base_link</child_frame_id>
+        </plugin>
+    </gazebo>
+
+</robot>

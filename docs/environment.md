@@ -51,7 +51,14 @@ RViz2로 발행 확인된 센서 구성. 상세 정의는 `robot_gazebo/urdf/{li
 | IMU | `imu` | 50 Hz | `/imu` |
 | 카메라 (aurora) | `camera` | 640×400, FOV 60°(1.047 rad), 30 Hz, clip 0.1–10 m | **RGB 전용** — `/depth_cam/depth_cam`는 Image, **depth 미발행** |
 - 구동: `MecanumDrive` 플러그인 — `/controller/cmd_vel`(Twist)의 `linear.x/linear.y/angular.z`로 홀로노믹 제어.
-- ⚠️ RL(`0_project_proposal.md`)의 RGB-D 깊이 추종을 sim에서 쓰려면 `depth_camera`/`rgbd_camera` 센서 보강이 필요(현재 RGB만). → `docs/roadmap.md` 2단계.
+- ⚠️ RL(`rl_design/0_project_proposal.md`)의 RGB-D 깊이 추종을 sim에서 쓰려면 `depth_camera`/`rgbd_camera` 센서 보강이 필요(현재 RGB만). → `docs/roadmap.md` 2단계.
+
+## 로봇 스케일 포크 (`greenhouse_sim/urdf/`)
+온실 런치(`greenhouse.launch.py`)는 제조사 `robot.gazebo.xacro` 대신 **균일 확대 포크**
+`urdf/robot_scaled.gazebo.xacro`(`S=1.83`)로 스폰한다(몸체·바퀴 mesh·마운트 origin·질량 S³·관성 S⁵).
+- ⚠️ **불변식: 센서 링크(`camera_link0`, `lidar_frame`)의 visual/collision mesh `scale`은 1로 유지**(몸체·바퀴만 `${S}`),
+  마운트 joint origin은 `×S` 유지(큰 몸체 표면에 장착 = 비가림). 센서 mesh를 `${S}`로 키우면 ogre2 카메라 frustum이
+  대각선 yaw에서 degenerate되어 `/depth_cam`이 회색이 된다 — 상세·재현·해결은 `docs/troubleshooting.md`.
 
 ## 리소스 경로 (텍스처)
 Ignition은 `IGN_GAZEBO_RESOURCE_PATH`(Fortress) / `GZ_SIM_RESOURCE_PATH`로 상대경로 리소스를 찾는다.

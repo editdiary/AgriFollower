@@ -4,7 +4,7 @@
 주변 장애물에 맞춰 최적 자세를 잡는 주행 정책**을 강화학습으로 학습한다.
 단순 통로 주행/내비게이션이 아니라 **타겟(작업자) 추종**이 핵심 과제다.
 
-> RL 설계 단일 출처: **`0_project_proposal.md`** (MDP·보상·알고리즘·Sim-to-Real 상세).
+> RL 설계 단일 출처: **`rl_design/0_project_proposal.md`** (MDP·보상·알고리즘·Sim-to-Real 상세).
 > 이 로드맵은 그 설계를 **현재 ws(Ignition Fortress + 기존 토픽/온실)에서 실행하는 단계**로 풀어 쓴 것이다.
 > 토픽/제어 인터페이스는 `CLAUDE.md`의 표를 단일 출처로 사용.
 
@@ -17,8 +17,10 @@
   - `ros2 launch greenhouse_sim greenhouse.launch.py`로 온실 + ROSOrin 스폰을 GUI/noVNC에서 시각 확인.
   - RViz2로 `/scan`·`/scan/points`·`/imu`·`/odom`·`/joint_states`·`/depth_cam/*` 발행 및 `/controller/cmd_vel` 구독 확인.
   - teleop(매카넘 vx/vy/ω)로 통로 주행 거동 확인.
+- ✅ 로봇 몸체 스케일업(균일 `S=1.83` 포크 `greenhouse_sim/urdf/`)을 온실 런치에 적용.
+  - 이 과정에서 만난 **depth_cam 대각선(45/135/225/315°) 회색 렌더 버그**(센서 링크 mesh까지 스케일한 것이 원인)를 해결 → `docs/troubleshooting.md`.
 
-## MDP 요약 (출처: `0_project_proposal.md` §5 — 상세는 그쪽 참조)
+## MDP 요약 (출처: `rl_design/0_project_proposal.md` §5 — 상세는 그쪽 참조)
 - **상태(30차원):** 단일 프레임 10차원 = 타겟 상대좌표 `[ΔX, ΔZ, d]`(3) + LiDAR 기하 특징 `[d_left_min, d_right_min, d_obs_front, θ_obs_front]`(4) + 로봇 속도 `[vx, vy, ω]`(3). 최근 3프레임(`t, t-1, t-2`) 스택 → 30차원 1D 벡터.
 - **행동(3-DOF 연속):** `[ax, ay, aω] ∈ [-1,1]³` → `vx=ax·Vmax`, `vy=ay·Vmax`(Vmax≈0.5 m/s), `ω=aω·Wmax`(Wmax≈1.0 rad/s). 매카넘 홀로노믹 활용.
 - **보상:** `R = w1·R_tracking + w2·R_safety + w3·R_pose` (목표거리 d_opt≈1.5m 유지 / 충돌 근접 페널티 / 불필요 회전 페널티).
@@ -56,6 +58,6 @@
 
 ## 메모
 - 토픽/제어 인터페이스: `CLAUDE.md` 표 단일 출처.
-- RL 설계(MDP/보상/알고리즘): `0_project_proposal.md` 단일 출처.
+- RL 설계(MDP/보상/알고리즘): `rl_design/0_project_proposal.md` 단일 출처.
 - 온실 레이아웃 변경·재현: `gen_greenhouse_world.py` 파라미터 + `RANDOM_SEED`.
 - Ignition 전용 — 리셋/서비스/리소스경로에 Gazebo Classic 문법(`/reset_world`, `gazebo_ros`, `GAZEBO_RESOURCE_PATH`) 혼용 금지.

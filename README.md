@@ -16,7 +16,7 @@ ROSOrin(Hiwonder, 매카넘 휠) 로봇을 Ignition Gazebo 온실에 띄우고,
 **작업자(타겟)를 일정 거리로 추종하며 주변 장애물에 맞춰 최적 자세를 잡는 주행 정책**을 RL로 학습하는 것이 목표다.
 (단순 통로 주행/내비게이션이 아니라 **타겟 추종**이 핵심.)
 
-RL 설계(상태/행동/보상/알고리즘/Sim-to-Real) 전체는 [`0_project_proposal.md`](docs/0_project_proposal.md)에 정리되어 있다.
+RL 설계(상태/행동/보상/알고리즘/Sim-to-Real) 전체는 [`docs/rl_design/0_project_proposal.md`](docs/rl_design/0_project_proposal.md)에 정리되어 있다.
 
 ## 핵심 정보
 | 항목 | 내용 |
@@ -79,7 +79,7 @@ source ~/rosorin_sim_ws/.typerc
 ros2 launch robot_gazebo worlds.launch.py        # empty.sdf
 ros2 launch robot_gazebo room_worlds.launch.py   # robocup_home.sdf (데모 메시 복원 필요)
 
-# 온실 환경 (RL 대상)
+# 온실 환경 (RL 대상) — 1.83× 스케일 로봇 포크(greenhouse_sim/urdf/)를 스폰
 ros2 launch greenhouse_sim greenhouse.launch.py
 
 # 키보드 teleop (매카넘 vx/vy/ω)
@@ -113,7 +113,7 @@ colcon build --symlink-install --packages-select greenhouse_sim
 ## 패키지 구조 (`src/`)
 ```
 rosorin_sim_ws/
-├── docs/                              # 상세 문서 (0_project_proposal.md·roadmap·environment 등 — 아래 링크)
+├── docs/                              # 상세 문서 (rl_design/·roadmap·environment 등 — 아래 링크)
 └── src/
     ├── simulations/                   # ⚠️ 제조사 monorepo — repo에 미포함. zip에서 복원 ("제조사 코드 & 에셋")
     │   ├── robot_gazebo/              #   Ignition world·로봇 spawn·브리지·ros2_control·teleop (시뮬 진입점)
@@ -136,9 +136,12 @@ rosorin_sim_ws/
 > 텍스처(`greenhouse_sim/media/.../*.jpg`)는 **우리 자체 에셋**이라 repo에 포함한다.
 
 ## 문서
-- [`0_project_proposal.md`](docs/0_project_proposal.md) — **RL 설계 단일 출처** (상태/행동/보상/종료, SAC·PPO, Sim-to-Real)
+- [`docs/rl_design/`](docs/rl_design/) — **RL 설계 문서** 모음
+  - [`0_project_proposal.md`](docs/rl_design/0_project_proposal.md) — RL 설계 단일 출처 (상태/행동/보상/종료, SAC·PPO, Sim-to-Real)
+  - [`rl_state_space.md`](docs/rl_design/rl_state_space.md) · [`rl_reward_function.md`](docs/rl_design/rl_reward_function.md) · [`rl_train_senarioes.md`](docs/rl_design/rl_train_senarioes.md) — 상태/보상/학습 시나리오 세부 노트
 - [`docs/roadmap.md`](docs/roadmap.md) — 진행 상황 & 단계별 실행 계획 (검증 → sim 보강 → `rosorin_rl` → 학습 → Sim-to-Real)
-- [`docs/setup_process.md`](docs/setup_process.md) — Ignition 세팅 성공 기록 & 트러블슈팅
+- [`docs/setup_process.md`](docs/setup_process.md) — Ignition 세팅 성공 기록 (설치 절차)
+- [`docs/troubleshooting.md`](docs/troubleshooting.md) — 치명적 오류 기록부 (원인·해결; 예: depth_cam 대각선 회색)
 - [`docs/environment.md`](docs/environment.md) — Ignition 스택 · `.typerc` · 토픽 · 센서 스펙
 - [`docs/hardware_requirements.md`](docs/hardware_requirements.md) — Docker/GPU 환경 · 학습 처리량
 
