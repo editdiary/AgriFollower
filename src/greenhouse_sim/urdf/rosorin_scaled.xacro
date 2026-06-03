@@ -115,7 +115,7 @@
     name="lidar"
     type="fixed">
     <origin
-      xyz="${0.011476*S} ${7.415E-05*S} ${0.13641*S}"
+      xyz="${0.011476*S} ${7.415E-05*S} ${0.10956*S + 0.02686}"
       rpy="0 0 0" />
     <parent
       link="base_link" />
@@ -325,57 +325,6 @@
       link="base_link" />
     <child
       link="right_back_wheel_link" />
-    <axis
-      xyz="0 0 0" />
-  </joint>
-  <link
-    name="mic_link">
-    <inertial>
-      <origin
-        xyz="${-7.65493159082808E-07*S} ${-0.0249662719365599*S} ${0.0134328993494675*S}"
-        rpy="0 0 0" />
-      <mass
-        value="0.1" />
-      <inertia
-        ixx="${1.36191114404946E-05 * (0.1/0.0210934941268813) * S**2}"
-        ixy="${-4.3417522172067E-10 * (0.1/0.0210934941268813) * S**2}"
-        ixz="${-1.27861440031619E-10 * (0.1/0.0210934941268813) * S**2}"
-        iyy="${3.01739703567571E-05 * (0.1/0.0210934941268813) * S**2}"
-        iyz="${4.99987016844085E-11 * (0.1/0.0210934941268813) * S**2}"
-        izz="${4.19372593423754E-05 * (0.1/0.0210934941268813) * S**2}" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file://$(find rosorin_description)/meshes/mic_link.stl"
-          scale="${S} ${S} ${S}" />
-      </geometry>
-      <material name="black"/>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file://$(find rosorin_description)/meshes/mic_link_collision.stl"
-          scale="${S} ${S} ${S}" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="mic"
-    type="fixed">
-    <origin
-      xyz="${-0.068965*S} ${0.025075*S} ${0.10955*S}"
-      rpy="0 0 0" />
-    <parent
-      link="base_link" />
-    <child
-      link="mic_link" />
     <axis
       xyz="0 0 0" />
   </joint>
