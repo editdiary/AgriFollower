@@ -23,7 +23,7 @@ RL 설계(상태/행동/보상/알고리즘/Sim-to-Real) 전체는 [`docs/rl_des
 |------|------|
 | 시뮬레이터 | **Ignition Gazebo Fortress 6.x** (Gazebo Classic 아님) · 렌더 `ogre2`(GPU) |
 | 로봇 | ROSOrin Mecanum (4 매카넘 휠, 3-DOF 홀로노믹) |
-| 센서 | 2D LiDAR(MS200) · RGB 카메라(aurora) · IMU |
+| 센서 | 2D LiDAR(MS200) · RGB-D 카메라(aurora, `rgbd_camera` → `/depth_cam/*`) · IMU |
 | RL 과제 | 작업자 추종 (거리 유지 + 장애물 회피 + 매카넘 최적 자세) |
 | RL 스택(예정) | Gymnasium + Stable-Baselines3 (SAC 1순위 / PPO 베이스라인) |
 | 환경 | Docker(`nvidia-egl-desktop-ros2:humble`, noVNC) · Ubuntu 22.04 · ROS 2 Humble · Python 3.10 |
@@ -105,9 +105,12 @@ colcon build --symlink-install --packages-select greenhouse_sim
 | `/joint_states` | `sensor_msgs/JointState` | IGN→ROS |
 | `/scan` · `/scan/points` | `LaserScan` · `PointCloud2` | IGN→ROS |
 | `/imu` | `sensor_msgs/Imu` | IGN→ROS |
-| `/depth_cam/depth_cam` | `sensor_msgs/Image` (RGB) | IGN→ROS |
-| `/depth_cam/rgb/camera_info` | `sensor_msgs/CameraInfo` | IGN→ROS |
+| `/depth_cam/image` | `sensor_msgs/Image` (RGB) | IGN→ROS |
+| `/depth_cam/depth_image` | `sensor_msgs/Image` (32FC1) | IGN→ROS |
+| `/depth_cam/points` | `sensor_msgs/PointCloud2` | IGN→ROS |
+| `/depth_cam/camera_info` | `sensor_msgs/CameraInfo` | IGN→ROS |
 - `nav:=true`로 띄우면 `/controller/cmd_vel`가 `/cmd_vel`로 리매핑됨. 스폰 엔티티 이름은 `robot`.
+- `/depth_cam/*`는 RGB-D(`rgbd_camera`) — greenhouse 스택의 브리지 포크(`greenhouse_sim/launch/ros_ign_bridge.launch.py`) 기준. frame_id `camera_link0`.
 - 센서 스펙·구동 플러그인 상세는 [`docs/environment.md`](docs/environment.md).
 
 ## 패키지 구조 (`src/`)

@@ -28,7 +28,6 @@ def launch_setup(context):
     moveit_unite_arg = DeclareLaunchArgument('moveit_unite', default_value=moveit_unite)
 
     greenhouse_share = get_package_share_directory('greenhouse_sim')
-    robot_gazebo_share = get_package_share_directory('robot_gazebo')
 
     # world 파일
     world = os.path.join(greenhouse_share, 'worlds', 'greenhouse.sdf')
@@ -59,10 +58,10 @@ def launch_setup(context):
         }.items(),
     )
 
-    # ROS <-> Ignition 브리지 (robot_gazebo 재사용)
+    # ROS <-> Ignition 브리지 (greenhouse 포크 — RGB-D /depth_cam/* 포함)
     ros_ign_bridge_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(robot_gazebo_share, 'launch', 'ros_ign_bridge.launch.py')),
+            os.path.join(greenhouse_share, 'launch', 'ros_ign_bridge.launch.py')),
         launch_arguments={
             'use_sim_time': use_sim_time,
         }.items(),

@@ -34,7 +34,7 @@
 현재 sim에는 RL에 필요한 요소 일부가 없다. **제조사 `src/simulations/`는 수정하지 않고**, 우리 패키지(`greenhouse_sim`/신규 `rosorin_rl`)로 보강한다.
 - [ ] **(a) 이동 타겟(작업자) 추가:** 온실에 이동 원기둥(또는 actor) 1개 + 컨트롤러 노드(직진/지그재그·무작위 속도). 통로 사이를 돌아다니게 함.
 - [ ] **(b) 타겟 상대좌표 토픽:** sim에선 객체검출 대신 타겟 엔티티 ground-truth pose에서 로봇 기준 상대좌표 `[ΔX, ΔZ, d]` 산출 → 토픽 발행. **가우시안 노이즈(±2~5%) 주입**으로 도메인 랜덤화(Sim-to-Real 대비).
-- [ ] **(c) RGB-D 깊이 센서 보강:** 현재 카메라는 **RGB 전용**(`type="camera"`, `/depth_cam/depth_cam`는 Image, depth 미발행). 실물 RGB-D 추종 파이프라인을 sim에서 재현하려면 `depth_camera`/`rgbd_camera` 센서가 필요. → 우리 패키지에 **depth 카메라 오버레이 xacro** 추가 권장. (단, (b)처럼 ground-truth 좌표로 학습하면 sim 단계에선 선택사항.)
+- [x] **(c) RGB-D 깊이 센서 보강:** 완료. greenhouse 스택 카메라를 `rgbd_camera`로 교체(`greenhouse_sim/urdf/depth_cam_scaled.gazebo.xacro`; `robot_scaled.gazebo.xacro`가 벤더 RGB 카메라 대신 include). `/depth_cam/{image,depth_image,points,camera_info}` 발행, frame_id `camera_link0`(브리지 포크: `greenhouse_sim/launch/ros_ign_bridge.launch.py`). RViz2 PointCloud2/Image 확인.
 - [ ] **(d) 환경 리셋 경로 확정:** ⚠️ proposal §4.3의 `/reset_world`는 **Gazebo Classic 문법**. 본 ws는 Ignition Fortress이므로 **`/world/greenhouse_world/control`(WorldControl reset)** 또는 엔티티 재배치용 **`/world/greenhouse_world/set_pose`** 를 사용(ros_gz 브리지 또는 ign transport 직접 호출). 로봇·타겟 위치 초기화 방식 결정.
 - [ ] **(e) 경량 학습 world 옵션:** 온실 잎은 이미 box collision이라 LiDAR엔 동일하고 텍스처는 렌더 비용만 추가. 헤드리스 LiDAR 학습 처리량을 위해 `gen_greenhouse_world.py`에 **텍스처 off / primitive-only** 변형 옵션 추가 권장. (카메라/정성평가용으로는 텍스처 온실 유지.)
 

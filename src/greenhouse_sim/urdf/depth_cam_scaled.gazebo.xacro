@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  depth_cam_scaled.gazebo.xacro — camera_link0 에 RGB-D(rgbd_camera) 센서를 정의한다.
+
+  벤더 camera.gazebo.xacro 는 type="camera"(RGB 전용)라 depth/points 가 안 나온다.
+  robot_scaled.gazebo.xacro 가 벤더 카메라 대신 이 파일을 include 해서, 같은 camera_link0
+  에 rgbd_camera 한 개로 RGB + depth_image + points 를 모두 발행한다(실물 aurora 와 동일 구조).
+
+  intrinsics 는 벤더 RGB 카메라와 동일하게 둬서 실물 aurora 모델과 일치시킨다
+  (FOV 1.047rad, 640x400, clip 0.1-10m, 30Hz). 센서 mesh 는 키우지 않는다
+  (ascamera_scaled.xacro 가 scale=1 유지) — 대각선 yaw 회색 회귀 방지.
+
+  <topic>depth_cam</topic> 으로 Ignition 이 다음을 발행:
+    depth_cam/image, depth_cam/depth_image, depth_cam/points, depth_cam/camera_info
+-->
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <gazebo reference="camera_link0">
+    <sensor name="depth_cam" type="rgbd_camera">
+      <camera>
+        <horizontal_fov>1.047</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>400</height>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>10</far>
+        </clip>
+      </camera>
+      <always_on>1</always_on>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+      <topic>depth_cam</topic>
+      <!-- frame_id 를 TF 에 존재하는 링크명으로 (없으면 Ignition 스코프명 robot/.../depth_cam
+           으로 폴백 → RViz PointCloud2/Camera 가 변환 실패로 드롭). LiDAR 와 동일 패턴. -->
+      <ignition_frame_id>camera_link0</ignition_frame_id>
+    </sensor>
+  </gazebo>
+</robot>

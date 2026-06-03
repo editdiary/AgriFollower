@@ -12,7 +12,7 @@ ROSOrin(매카넘) **Ignition Gazebo 시뮬 + 강화학습** 워크스페이스.
 | 빌드 | `colcon build --symlink-install` |
 | 실행 환경 | Docker 컨테이너 `nvidia-egl-desktop-ros2:humble` · GPU 가속 · noVNC(`:6080`) |
 | 로봇 | ROSOrin Mecanum (4 매카넘 휠, 3-DOF 홀로노믹) |
-| 센서 | 2D LiDAR `MS200` · RGB 카메라 `aurora` · IMU (구성은 루트 `.typerc`로 결정) |
+| 센서 | 2D LiDAR `MS200` · RGB-D 카메라 `aurora`(greenhouse 스택은 `rgbd_camera`, `/depth_cam/*`) · IMU (구성은 루트 `.typerc`로 결정) |
 | RL 스택(예정) | Gymnasium + Stable-Baselines3 (SAC 1순위 / PPO 베이스라인) |
 
 ## 반드시 지킬 것 (invariants)
