@@ -36,22 +36,38 @@
 
 ## 2단계 — 시뮬 선결 과제 (RL 학습에 필요한 환경/센서 보강)
 현재 sim에는 RL에 필요한 요소 일부가 없다. **제조사 `src/simulations/`는 수정하지 않고**, 우리 패키지(`greenhouse_sim`/신규 `rosorin_rl`)로 보강한다.
-- [ ] **(a) 이동 타겟(작업자) 추가:** 온실에 이동 원기둥(또는 actor) 1개 + 컨트롤러 노드(직진/지그재그·무작위 속도). 통로 사이를 돌아다니게 함.
-- [ ] **(b) 타겟 특징 토픽:** sim에선 객체검출 대신 타겟 엔티티 ground-truth pose에서 로봇 기준 타겟 특징 `[x_norm, y_norm, d_t, θ_t]`(`rl_state_space.md` §2.1) 산출 → 토픽 발행. **가우시안 노이즈(±2~5%) 주입**으로 도메인 랜덤화(Sim-to-Real 대비).
+- [x] **(a) 이동 타겟(작업자) 추가:** 완료. 원기둥(`rosorin_rl/worlds_models/worker_target.sdf`, static) + 컨트롤러 노드(`target_controller_node.py`, 시나리오 1=정속 왕복, 전략 패턴으로 2~5 확장 가능). ⚠️ velocity-control 플러그인은 Fortress에서 link gravity off 미지원으로 원기둥이 넘어져 폐기 → **20Hz set_pose 키네마틱 구동**으로 구현 (`docs/rl_code_guide.md` §5).
+- [x] **(b) 타겟 특징 토픽:** 완료. `target_feature_node.py` — 로봇 ground-truth(`dynamic_pose/info`) + 작업자 pose(`/worker/pose`)에서 `[x_norm, y_norm, d_t, θ_t, visible]` 역산, 가우시안 노이즈 3% 주입 → `/target/features` 발행. Sim-to-Real 때 이 노드만 실물 비전으로 교체.
 - [x] **(c) RGB-D 깊이 센서 보강:** 완료. greenhouse 스택 카메라를 `rgbd_camera`로 교체(`greenhouse_sim/urdf/depth_cam_scaled.gazebo.xacro`; `robot_scaled.gazebo.xacro`가 벤더 RGB 카메라 대신 include). `/depth_cam/{image,depth_image,points,camera_info}` 발행, frame_id `camera_link0`(브리지 포크: `greenhouse_sim/launch/ros_ign_bridge.launch.py`). RViz2 PointCloud2/Image 확인.
-- [ ] **(d) 환경 리셋 경로 확정:** ⚠️ proposal §4.3의 `/reset_world`는 **Gazebo Classic 문법**. 본 ws는 Ignition Fortress이므로 **`/world/greenhouse_world/control`(WorldControl reset)** 또는 엔티티 재배치용 **`/world/greenhouse_world/set_pose`** 를 사용(ros_gz 브리지 또는 ign transport 직접 호출). 로봇·타겟 위치 초기화 방식 결정.
-- [ ] **(e) 경량 학습 world 옵션:** 온실 잎은 이미 box collision이라 LiDAR엔 동일하고 텍스처는 렌더 비용만 추가. 학습 처리량을 위해 `gen_greenhouse_world.py`에 **텍스처 off / primitive-only** 변형 옵션 추가 권장. (현행 상태공간은 뎁스 범퍼용 카메라 렌더가 필수라 카메라 자체는 끄지 않음 — 텍스처 off는 렌더 비용 절감 목적. 정성평가용으로는 텍스처 온실 유지.)
+- [x] **(d) 환경 리셋 경로 확정:** 완료. **`/world/greenhouse_world/set_pose`** 를 ros_gz 브리지(`ros_gz_interfaces/srv/SetEntityPose` — Humble 브리지가 지원함을 확인)로 노출, `follow_env.reset()`이 rclpy 서비스 클라이언트로 호출해 로봇 텔레포트 + `/worker/reset`으로 작업자 초기화. (WorldControl 전체 리셋은 sim time까지 리셋되어 불채택.)
+- [ ] **(e) 경량 학습 world 옵션:** 온실 잎은 이미 box collision이라 LiDAR엔 동일하고 텍스처는 렌더 비용만 추가. 학습 처리량을 위해 `gen_greenhouse_world.py`에 **텍스처 off / primitive-only** 변형 옵션 추가 권장. (현행 상태공간은 뎁스 범퍼용 카메라 렌더가 필수라 카메라 자체는 끄지 않음 — 텍스처 off는 렌더 비용 절감 목적. 정성평가용으로는 텍스처 온실 유지.) → 우선 **`headless:=true`**(GUI 없이 서버+센서 렌더만)는 `greenhouse.launch.py`/`rl_sim.launch.py`에 추가 완료.
 
-## 3단계 — RL 환경 패키지 (`rosorin_rl`)
-- [ ] 새 패키지 `src/rosorin_rl/` 생성 (제조사 monorepo와 분리).
-- [ ] RL 라이브러리 설치: `stable-baselines3` / `gymnasium` / `torch` (컨테이너에 미설치 상태).
-- [ ] **커스텀 Gymnasium Env(= ROS2 노드)** 작성:
-  - `_get_obs()`: `/scan`(→ 6구역 최솟값 압축) + 타겟 특징 토픽(2단계 (b)) + `/depth_cam/depth_image`(하단 뎁스 범퍼 3D — intrinsic/extrinsic 활용은 `rl_state_space.md` §2.5) + `/imu`·`/odom`(로봇 속도) 구독 → 16차원 정제 후 **3프레임 스택 → 48차원**. 노이즈 주입.
-  - `step(action)`: `[ax,ay,aω]`를 물리값으로 스케일링 → `/controller/cmd_vel`(Twist, vx/vy/ω) 발행 → 일정 시간(ROS rate) 진행 후 보상 계산.
-  - `reset()`: 2단계 (d)의 Ignition 서비스로 로봇·타겟 초기화, 상태 버퍼 비움.
-- [ ] 보상 함수(`R_tracking`/`R_safety`/`R_pose_center`)·모드 전환·종료조건 구현 (`rl_reward_function.md`·`rl_train_senarioes.md`).
+## 3단계 — RL 환경 패키지 (`rosorin_rl`) ✅ (2026-06)
+- [x] 새 패키지 `src/rosorin_rl/` 생성 (제조사 monorepo와 분리). 구조·코드 가이드는 **`docs/rl_code_guide.md`**.
+- [x] RL 라이브러리 설치: gymnasium 1.2.3 / SB3 2.8.0 / **torch 2.8.0+cu128** (⚠️ 컨테이너 드라이버=CUDA 12.8이라 기본 pip torch(cu13x)는 GPU 인식 실패 — cu128 빌드 필수) / numpy<2 핀(cv_bridge 보호).
+- [x] **커스텀 Gymnasium Env** 작성 (`follow_env.py` — 내부 rclpy 노드 + 백그라운드 executor):
+  - `_collect_obs()`: `/scan` 6구역(5퍼센타일+EMA) + `/target/features` + `/depth_cam/depth_image` 뎁스범퍼(**바닥 차감** 보정 — `rl_code_guide.md` §5) + `/odom` 속도 → 16차원 → 3프레임 스택 48차원 (`obs_pipeline.py`).
+  - `step(action)`: `[ax,ay,aω]` 스케일링 → `/controller/cmd_vel` 발행 → **sim time 0.1s** 대기 → 보상. ⚠️ 벤더 MecanumDrive의 **linear.y 부호 반전** 보정 포함 (실물 포팅 시 제거 — `rl_code_guide.md` §5).
+  - `reset()`: set_pose 텔레포트 + 작업자 리셋 + stale 프레임 방지 순서 적용.
+- [x] 보상 함수·모드 전환·종료조건 구현 (`reward.py`). 계수 초기값·튜닝 가이드는 `config/rl_params.yaml` + `rl_code_guide.md` §3. (검증 중 환경충돌 임계 0.12→**0.20** 보정 — LiDAR가 로봇 중심 기준이라 반폭 반영.)
+- [x] 학습/평가 스크립트 (`train_sac.py` SAC/PPO, `eval_policy.py` 3지표) + 통합 런치 (`rl_sim.launch.py`).
 
-## 4단계 — 학습 / 평가
+## 4단계 — 학습 / 평가 (진행 중, 2026-06)
+- [x] 1차 200k 학습 시도 → 14k 시점 정체 진단(ep_len~50 고정 = lost 반복, 추적 기울기 소멸)
+  → **2차 조정**: 스폰 위치(로봇 -0.5 / 작업자 0.6 통로 입구), 작업자 0.05m/s(커리큘럼 0단계),
+  보상 재균형(w1↑·w2↓·α↓·접근 shaping 신규·env_collision -30), AprilTag 시각 패널,
+  진단 로깅(종료사유 분포·보상 분해·행동 통계 → TB + monitor.csv), resume 시 Replay Buffer 복원.
+  상세·튜닝 가이드는 `docs/rl_code_guide.md` §3~§5.
+- [x] **3차 수정 — 충돌 감지 버그 해결**: 단일 반경 임계로는 직사각형 로봇의 전/후면 접촉이
+  미감지되던 문제(사용자 GUI 관찰로 발견)를 **풋프린트 마진 판정**(`obs_pipeline.env_margin`)으로
+  교체, 4방향 실측 검증. 시작 위치 -0.40 확정, 충돌 워밍업 분리(3스텝). 충돌 처리 설계는
+  "즉시 리셋 + R_safety 사전 페널티" 확정 — `docs/rl_code_guide.md` §5-9·10.
+- [x] **4차 수정 — 타겟 차폐 판정 + 배회 국소최적 해소**: 가시성이 화각만 검사해 작물 벽
+  너머도 visible=1 이던 "벽 투시" 버그(사용자 GUI 관찰로 발견)를 작물 줄 AABB 선분 교차
+  판정으로 수정(`geometry_utils.OCCLUDERS`), 다른 통로 텔레포트 → lost 발화 실측 검증.
+  18k 진단(d_t_mean 1.4·in_aisle 0.29 = 입구 배회)으로 α 1.5→3.0 복원 —
+  `docs/rl_code_guide.md` §3·§5-12.
+- [ ] 커리큘럼 0단계(0.05m/s) 수렴 확인 → 속도 0.1 → 0.25 단계 상향 (`target.speed` + launch `speed`).
 - [ ] **SAC(1순위)** 로 학습, **PPO(베이스라인)** 와 비교 (둘 다 SB3).
 - [ ] 헤드리스(가능하면 다중 인스턴스)로 학습 처리량 확보. (Gazebo는 real-time 대비 ~2–5x 한계 — `docs/hardware_requirements.md`.)
 - [ ] 평가 3지표 (proposal §6.3): 학습 수렴 속도(Ep_rew_mean, TensorBoard) / 주행 부드러움(ω 변화량) / 센서 노이즈 강건성(노이즈 30% 주입 시 실패율).

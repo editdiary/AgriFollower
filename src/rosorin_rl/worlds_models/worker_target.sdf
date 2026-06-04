@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!--
+  worker_target.sdf — 작업자(타겟)를 대신하는 이동 원기둥 모델.
+
+  proposal §4.2 의 "움직이는 원기둥으로 사람을 대체" 설계를 구현한다.
+  - 반지름 0.12m, 높이 1.6m: 서 있는 사람의 몸통 폭/키를 근사.
+    LiDAR 스캔 평면(z≈0.23m)과 카메라 시야에 모두 잡히는 높이.
+
+  [ 구동 방식: set_pose 키네마틱 (static 모델) ]
+  target_controller_node.py 가 자체 적분한 pose 를 20Hz 로
+  /world/greenhouse_world/set_pose 서비스에 보내 위치를 갱신한다.
+  - 0.25 m/s ÷ 20 Hz = 틱당 1.25cm 이동 — LiDAR(10Hz)에는 연속 이동으로 보임.
+  - static 모델이라 물리(중력·충돌 반작용)의 영향을 전혀 받지 않는다.
+    ⚠️ 처음에는 velocity-control 플러그인 + gravity off 로 시도했으나,
+    Fortress 에서 link 레벨 <gravity>false</gravity> 가 무시되어 스폰 직후
+    원기둥이 넘어지는 문제(pitch 90°)가 발생 → set_pose 방식으로 전환.
+  - collision 은 살아 있으므로 LiDAR 레이저에는 정상적으로 잡힌다
+    (온실의 static 작물 벽이 잡히는 것과 동일).
+-->
+<sdf version="1.8">
+  <model name="worker_target">
+    <static>true</static>
+
+    <link name="body">
+      <pose>0 0 0 0 0 0</pose>
+
+      <!-- LiDAR 에 잡히는 충돌체 -->
+      <collision name="body_collision">
+        <geometry>
+          <cylinder><radius>0.12</radius><length>1.6</length></cylinder>
+        </geometry>
+      </collision>
+
+      <!-- 눈으로 확인하기 위한 시각 모델 (주황색 = 작업조끼 느낌) -->
+      <visual name="body_visual">
+        <geometry>
+          <cylinder><radius>0.12</radius><length>1.6</length></cylinder>
+        </geometry>
+        <material>
+          <ambient>0.9 0.45 0.1 1</ambient>
+          <diffuse>0.9 0.45 0.1 1</diffuse>
+        </material>
+      </visual>
+
+      <!-- AprilTag (tag36h11 ID 0) 시각 패널 ×2 — 원기둥 앞/뒤(±x) 면에 부착.
+           높이: 모델 로컬 z = -0.45 → 월드 z = 0.35 m.
+           ★ target_feature_node 의 GT 역산이 가정하는 marker_height(0.35m)와 동일 위치 —
+           즉 "여기 보이는 태그를 검출했다면 얻었을 값"이 /target/features 로 발행된다.
+           (검출 자체는 시뮬에선 수행하지 않음 — Sim-to-Real 시 실물 비전으로 교체.)
+           텍스처: 같은 디렉터리의 tag36_11_00000.png (SDF 기준 상대경로),
+           greenhouse_sim 잎 패널과 동일한 인라인 PBR albedo_map 기법. -->
+      <visual name="apriltag_front">
+        <!-- 원기둥 표면(r=0.12) 바로 바깥 +x 면 -->
+        <pose>0.1235 0 -0.45 0 0 0</pose>
+        <geometry>
+          <box><size>0.005 0.16 0.16</size></box>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular>
+          <pbr><metal>
+            <albedo_map>tag36_11_00000.png</albedo_map>
+            <metalness>0.0</metalness><roughness>1.0</roughness>
+          </metal></pbr>
+        </material>
+      </visual>
+      <visual name="apriltag_back">
+        <!-- -x 면 (로봇이 뒤따라올 때 보는 쪽) -->
+        <pose>-0.1235 0 -0.45 0 0 0</pose>
+        <geometry>
+          <box><size>0.005 0.16 0.16</size></box>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular>
+          <pbr><metal>
+            <albedo_map>tag36_11_00000.png</albedo_map>
+            <metalness>0.0</metalness><roughness>1.0</roughness>
+          </metal></pbr>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

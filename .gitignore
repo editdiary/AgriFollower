@@ -14,7 +14,9 @@ __pycache__/
 .idea/
 *.swp
 .DS_Store
+.claude/
 
 # 제조사(Hiwonder) monorepo — repo에 vendoring하지 않음 (라이선스 미선언 제3자 코드).
 # 클론 후 제조사 simulations.zip에서 src/simulations/ 로 복원. 안내: 루트 README.md "제조사 코드 & 에셋" 섹션.
 src/simulations/
+rl_logs/

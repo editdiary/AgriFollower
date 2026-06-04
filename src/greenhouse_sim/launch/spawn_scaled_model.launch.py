@@ -73,7 +73,10 @@ def launch_setup(context):
         arguments=['-topic', 'robot_description',
                    '-name', 'robot',
                    '-allow_renaming', 'true',
-                   '-x', '0',
+                   # x=-0.40: 입구 문(서쪽 벽 x=-0.90) 앞 — RL 리셋 위치
+                   # (rosorin_rl config robot.reset_x)와 일치시켜 GUI 일관성 유지.
+                   # (풋프린트 충돌 판정 + LiDAR 노이즈 마진 실측으로 확정한 위치)
+                   '-x', '-0.40',
                    '-y', '0',
                    '-z', '0.02'
                    ],

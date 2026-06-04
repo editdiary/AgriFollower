@@ -13,7 +13,7 @@ ROSOrin(매카넘) **Ignition Gazebo 시뮬 + 강화학습** 워크스페이스.
 | 실행 환경 | Docker 컨테이너 `nvidia-egl-desktop-ros2:humble` · GPU 가속 · noVNC(`:6080`) |
 | 로봇 | ROSOrin Mecanum (4 매카넘 휠, 3-DOF 홀로노믹) |
 | 센서 | 2D LiDAR `MS200` · RGB-D 카메라 `aurora`(greenhouse 스택은 `rgbd_camera`, `/depth_cam/*`) · IMU (구성은 루트 `.typerc`로 결정) |
-| RL 스택(예정) | Gymnasium + Stable-Baselines3 (SAC 1순위 / PPO 베이스라인) |
+| RL 스택 | Gymnasium 1.2 + SB3 2.8 + torch 2.8.0+**cu128**(드라이버=CUDA 12.8, cu13x 불가) · numpy<2 핀 · 코드는 `src/rosorin_rl/` |
 
 ## 반드시 지킬 것 (invariants)
 - **Ignition Gazebo Fortress 전용.** Gazebo Classic 문법(`gazebo_ros`, `spawn_entity.py`, OGRE `.material`, `GAZEBO_RESOURCE_PATH`, `/reset_world`)을 섞지 말 것.
@@ -26,6 +26,7 @@ ROSOrin(매카넘) **Ignition Gazebo 시뮬 + 강화학습** 워크스페이스.
 ## 어디에 뭐가 있나 (필요할 때 참조)
 - 프로젝트 개요·실행 환경·빌드/실행·온실 재생성·토픽표 → `README.md`
 - RL 설계 (MDP·보상·SAC/PPO·Sim-to-Real) → `docs/rl_design/` (개요 `0_project_proposal.md` · 구체 수치/수식의 단일 출처는 상태/보상/시나리오 세부 노트)
+- RL 코드 (아키텍처·검증 체크리스트·튜닝 표·**시뮬 보정 사항**: 매카넘 y반전·뎁스범퍼 바닥차감·set_pose 타겟) → `docs/rl_code_guide.md`
 - 진행 상황·단계별 실행 계획 → `docs/roadmap.md`
 - Ignition 스택·`.typerc`·토픽 인터페이스·센서 스펙 → `docs/environment.md`
 - Docker/GPU 환경·학습 처리량 → `docs/hardware_requirements.md`

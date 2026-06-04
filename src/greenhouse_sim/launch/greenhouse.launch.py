@@ -23,9 +23,13 @@ from launch.substitutions import LaunchConfiguration
 def launch_setup(context):
     use_sim_time = LaunchConfiguration('use_sim_time', default='true').perform(context)
     moveit_unite = LaunchConfiguration('moveit_unite', default='false').perform(context)
+    # headless:=true 면 GUI 없이 서버만 실행 (RL 학습 처리량 확보용).
+    # --headless-rendering: GUI 없이도 카메라 센서 렌더링(EGL)은 유지.
+    headless = LaunchConfiguration('headless', default='false').perform(context)
 
     use_sim_time_arg = DeclareLaunchArgument('use_sim_time', default_value=use_sim_time)
     moveit_unite_arg = DeclareLaunchArgument('moveit_unite', default_value=moveit_unite)
+    headless_arg = DeclareLaunchArgument('headless', default_value=headless)
 
     greenhouse_share = get_package_share_directory('greenhouse_sim')
 
@@ -42,11 +46,12 @@ def launch_setup(context):
     gz_resource_env = prepend('GZ_SIM_RESOURCE_PATH')
 
     # Ignition Gazebo
+    server_flags = ' -s --headless-rendering' if headless == 'true' else ''
     ign_gz = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('ros_ign_gazebo'),
                         'launch', 'ign_gazebo.launch.py')),
-        launch_arguments=[('ign_args', [' -r ' + world])])
+        launch_arguments=[('ign_args', [' -r' + server_flags + ' ' + world])])
 
     # 로봇 스폰 (스케일된 xacro 사용 — 이 패키지 런치)
     spawn_model_launch = IncludeLaunchDescription(
@@ -70,6 +75,7 @@ def launch_setup(context):
     return [
         use_sim_time_arg,
         moveit_unite_arg,
+        headless_arg,
         ign_resource_env,
         gz_resource_env,
         ign_gz,
