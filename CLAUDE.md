@@ -1,7 +1,7 @@
 # CLAUDE.md — rosorin_sim_ws (AgriFollower)
 
 ROSOrin(매카넘) **Ignition Gazebo 시뮬 + 강화학습** 워크스페이스. 목표는 온실에서 **작업자(타겟) 추종** 주행 정책 학습.
-프로젝트 개요·환경·실행법은 `README.md`, RL 설계는 `docs/rl_design/0_project_proposal.md`가 단일 출처다.
+프로젝트 개요·환경·실행법은 `README.md`, RL 설계는 `docs/rl_design/`(개요 `0_project_proposal.md`, 수치·수식은 세부 노트)가 단일 출처다.
 (이 파일은 가볍게 유지 — 상세 절차/배경은 아래 "어디에 뭐가 있나"의 위치를 그때그때 참조할 것.)
 
 ## 개발 환경 & 버전 (코드/명령 생성 전 기준값)
@@ -25,7 +25,7 @@ ROSOrin(매카넘) **Ignition Gazebo 시뮬 + 강화학습** 워크스페이스.
 
 ## 어디에 뭐가 있나 (필요할 때 참조)
 - 프로젝트 개요·실행 환경·빌드/실행·온실 재생성·토픽표 → `README.md`
-- RL 설계 (MDP·보상·SAC/PPO·Sim-to-Real) → `docs/rl_design/` (단일 출처 `0_project_proposal.md` + 상태/보상/시나리오 세부 노트)
+- RL 설계 (MDP·보상·SAC/PPO·Sim-to-Real) → `docs/rl_design/` (개요 `0_project_proposal.md` · 구체 수치/수식의 단일 출처는 상태/보상/시나리오 세부 노트)
 - 진행 상황·단계별 실행 계획 → `docs/roadmap.md`
 - Ignition 스택·`.typerc`·토픽 인터페이스·센서 스펙 → `docs/environment.md`
 - Docker/GPU 환경·학습 처리량 → `docs/hardware_requirements.md`

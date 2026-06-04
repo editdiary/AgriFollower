@@ -18,7 +18,7 @@
 ## 부하 메모
 - depth/RGB 카메라 시뮬이 가장 무겁다. 학습 시에는 **헤드리스(`-s`/GUI off)** 와 해상도/주기 튜닝 권장.
 - RL 학습 처리량이 필요하면 헤드리스 + 다중 인스턴스 병렬 실행을 고려.
-- 단, **카메라 센서는 헤드리스에서도 GPU 렌더가 필요**하다(Ignition `Sensors` 시스템이 ogre2로 이미지 생성). 카메라 기반(RGB-D) 관측을 쓰면 처리량이 크게 떨어지므로, LiDAR 특징 위주 학습이면 카메라 비활성/경량 world가 유리. → `docs/roadmap.md` 2단계.
+- 단, **카메라 센서는 헤드리스에서도 GPU 렌더가 필요**하다(Ignition `Sensors` 시스템이 ogre2로 이미지 생성). 카메라 기반(RGB-D) 관측은 처리량을 크게 떨어뜨린다 — 현행 상태공간(`rl_design/rl_state_space.md`)은 뎁스 범퍼·마커 특징에 카메라가 필수라 비활성은 불가하고, 해상도/주기 튜닝 + 경량 world(텍스처 off)로 비용을 줄인다. → `docs/roadmap.md` 2단계.
 - Gazebo는 물리·렌더가 무거워 학습 속도가 real-time 대비 대략 ~2–5x 한계(`rl_design/0_project_proposal.md` §4.1). 가벼운 PyBullet 류 대비 느리지만, 실 센서와 동일한 토픽 구조가 장점이라 채택.
 
 ## 컨테이너 실행 예시

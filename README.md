@@ -16,7 +16,8 @@ ROSOrin(Hiwonder, 매카넘 휠) 로봇을 Ignition Gazebo 온실에 띄우고,
 **작업자(타겟)를 일정 거리로 추종하며 주변 장애물에 맞춰 최적 자세를 잡는 주행 정책**을 RL로 학습하는 것이 목표다.
 (단순 통로 주행/내비게이션이 아니라 **타겟 추종**이 핵심.)
 
-RL 설계(상태/행동/보상/알고리즘/Sim-to-Real) 전체는 [`docs/rl_design/0_project_proposal.md`](docs/rl_design/0_project_proposal.md)에 정리되어 있다.
+RL 설계는 [`docs/rl_design/0_project_proposal.md`](docs/rl_design/0_project_proposal.md)(개요·알고리즘·Sim-to-Real)와
+상태/보상/시나리오 세부 노트(구체 수치·수식의 단일 출처)에 정리되어 있다.
 
 ## 핵심 정보
 | 항목 | 내용 |
@@ -140,8 +141,8 @@ rosorin_sim_ws/
 
 ## 문서
 - [`docs/rl_design/`](docs/rl_design/) — **RL 설계 문서** 모음
-  - [`0_project_proposal.md`](docs/rl_design/0_project_proposal.md) — RL 설계 단일 출처 (상태/행동/보상/종료, SAC·PPO, Sim-to-Real)
-  - [`rl_state_space.md`](docs/rl_design/rl_state_space.md) · [`rl_reward_function.md`](docs/rl_design/rl_reward_function.md) · [`rl_train_senarioes.md`](docs/rl_design/rl_train_senarioes.md) — 상태/보상/학습 시나리오 세부 노트
+  - [`0_project_proposal.md`](docs/rl_design/0_project_proposal.md) — RL 설계 개요 (목적·파이프라인·MDP 개요, SAC·PPO, Sim-to-Real)
+  - [`rl_state_space.md`](docs/rl_design/rl_state_space.md) · [`rl_reward_function.md`](docs/rl_design/rl_reward_function.md) · [`rl_train_senarioes.md`](docs/rl_design/rl_train_senarioes.md) — 상태/보상/학습 시나리오 세부 노트 (**구체 수치·수식의 단일 출처**)
 - [`docs/roadmap.md`](docs/roadmap.md) — 진행 상황 & 단계별 실행 계획 (검증 → sim 보강 → `rosorin_rl` → 학습 → Sim-to-Real)
 - [`docs/setup_process.md`](docs/setup_process.md) — Ignition 세팅 성공 기록 (설치 절차)
 - [`docs/troubleshooting.md`](docs/troubleshooting.md) — 치명적 오류 기록부 (원인·해결; 예: depth_cam 대각선 회색)

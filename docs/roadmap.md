@@ -4,9 +4,10 @@
 주변 장애물에 맞춰 최적 자세를 잡는 주행 정책**을 강화학습으로 학습한다.
 단순 통로 주행/내비게이션이 아니라 **타겟(작업자) 추종**이 핵심 과제다.
 
-> RL 설계 단일 출처: **`rl_design/0_project_proposal.md`** (MDP·보상·알고리즘·Sim-to-Real 상세).
+> RL 설계: 개요·알고리즘·Sim-to-Real은 **`rl_design/0_project_proposal.md`**, 구체 수치·수식의 단일 출처는
+> **세부 노트**(`rl_design/rl_state_space.md`·`rl_reward_function.md`·`rl_train_senarioes.md`).
 > 이 로드맵은 그 설계를 **현재 ws(Ignition Fortress + 기존 토픽/온실)에서 실행하는 단계**로 풀어 쓴 것이다.
-> 토픽/제어 인터페이스는 `CLAUDE.md`의 표를 단일 출처로 사용.
+> 토픽/제어 인터페이스는 `README.md`·`docs/environment.md`의 표를 단일 출처로 사용.
 
 ## 현재 상태 (2026-06)
 - ✅ 제조사 공식 절차로 Ignition Gazebo 시뮬 세팅 성공 (`docs/setup_process.md`).
@@ -19,12 +20,15 @@
   - teleop(매카넘 vx/vy/ω)로 통로 주행 거동 확인.
 - ✅ 로봇 몸체 스케일업(균일 `S=1.83` 포크 `greenhouse_sim/urdf/`)을 온실 런치에 적용.
   - 이 과정에서 만난 **depth_cam 대각선(45/135/225/315°) 회색 렌더 버그**(센서 링크 mesh까지 스케일한 것이 원인)를 해결 → `docs/troubleshooting.md`.
+- ✅ **RGB-D 통합 + LiDAR 360° 확장.** 카메라를 `rgbd_camera`로 교체(`/depth_cam/{image,depth_image,points,camera_info}`),
+  LiDAR를 실물 MS200과 동일한 360°(450 samples)로 확장. 카메라 intrinsic·Cam–LiDAR extrinsic은 `docs/environment.md` 참조.
+- ✅ RL 상태/보상 설계를 RGB-D 기반으로 개정(16차원×3프레임=48차원, 뎁스 범퍼·전방 센서 퓨전) → `rl_design/` 세부 노트.
 
-## MDP 요약 (출처: `rl_design/0_project_proposal.md` §5 — 상세는 그쪽 참조)
-- **상태(30차원):** 단일 프레임 10차원 = 타겟 상대좌표 `[ΔX, ΔZ, d]`(3) + LiDAR 기하 특징 `[d_left_min, d_right_min, d_obs_front, θ_obs_front]`(4) + 로봇 속도 `[vx, vy, ω]`(3). 최근 3프레임(`t, t-1, t-2`) 스택 → 30차원 1D 벡터.
-- **행동(3-DOF 연속):** `[ax, ay, aω] ∈ [-1,1]³` → `vx=ax·Vmax`, `vy=ay·Vmax`(Vmax≈0.5 m/s), `ω=aω·Wmax`(Wmax≈1.0 rad/s). 매카넘 홀로노믹 활용.
-- **보상:** `R = w1·R_tracking + w2·R_safety + w3·R_pose` (목표거리 d_opt≈1.5m 유지 / 충돌 근접 페널티 / 불필요 회전 페널티).
-- **종료:** 환경충돌(d_min<0.15m), 타겟충돌(d<0.5m), 타겟이탈(d>4m 또는 시야 밖), 성공(최대스텝 유지).
+## MDP 요약 (수치 출처: `rl_design/rl_state_space.md`·`rl_reward_function.md` — 상세는 그쪽 참조)
+- **상태(48차원):** 단일 프레임 16차원 = RGB-D 마커 타겟 특징 `[x_norm, y_norm, d_t, θ_t]`(4) + RGB-D 하단 뎁스 범퍼 `[d_depth_{left,center,right}_low]`(3) + LiDAR 6구역 최솟값(6) + 로봇 속도 `[vx, vy, ω]`(3). 최근 3프레임(`t, t-1, t-2`) 스택 → 48차원 1D 벡터.
+- **행동(3-DOF 연속):** `[ax, ay, aω] ∈ [-1,1]³` → `vx=ax·Vmax`, `vy=ay·Vmax`(Vmax≈0.5 m/s), `ω=aω·Wmax`(Wmax≈1.0 rad/s). 매카넘 홀로노믹 활용. (출처: proposal §5.2)
+- **보상:** `R = w1·R_tracking + w2·R_safety + w3·R_pose_center` (목표거리 d_opt=0.65m 가우시안 / 전방 LiDAR+뎁스범퍼 min 퓨전·측면 이원화, 클리핑 2차 페널티 / 통로 정렬·중앙 유지) + 통로 내·외부 모드 전환.
+- **종료:** 성공(최대스텝 생존, +100) / 환경충돌(-100) / 타겟충돌(d_t<0.4m, -100) / 타겟이탈(d_t>3.0m 또는 시야 밖, -50) / 정체감지(-50).
 
 ## 1단계 — 온실 환경 검증 (완료)
 - [x] 온실 + 로봇 스폰 시각 확인, 전 토픽 RViz2 검증, teleop 주행 확인 (위 "현재 상태" 참조).
@@ -33,19 +37,19 @@
 ## 2단계 — 시뮬 선결 과제 (RL 학습에 필요한 환경/센서 보강)
 현재 sim에는 RL에 필요한 요소 일부가 없다. **제조사 `src/simulations/`는 수정하지 않고**, 우리 패키지(`greenhouse_sim`/신규 `rosorin_rl`)로 보강한다.
 - [ ] **(a) 이동 타겟(작업자) 추가:** 온실에 이동 원기둥(또는 actor) 1개 + 컨트롤러 노드(직진/지그재그·무작위 속도). 통로 사이를 돌아다니게 함.
-- [ ] **(b) 타겟 상대좌표 토픽:** sim에선 객체검출 대신 타겟 엔티티 ground-truth pose에서 로봇 기준 상대좌표 `[ΔX, ΔZ, d]` 산출 → 토픽 발행. **가우시안 노이즈(±2~5%) 주입**으로 도메인 랜덤화(Sim-to-Real 대비).
+- [ ] **(b) 타겟 특징 토픽:** sim에선 객체검출 대신 타겟 엔티티 ground-truth pose에서 로봇 기준 타겟 특징 `[x_norm, y_norm, d_t, θ_t]`(`rl_state_space.md` §2.1) 산출 → 토픽 발행. **가우시안 노이즈(±2~5%) 주입**으로 도메인 랜덤화(Sim-to-Real 대비).
 - [x] **(c) RGB-D 깊이 센서 보강:** 완료. greenhouse 스택 카메라를 `rgbd_camera`로 교체(`greenhouse_sim/urdf/depth_cam_scaled.gazebo.xacro`; `robot_scaled.gazebo.xacro`가 벤더 RGB 카메라 대신 include). `/depth_cam/{image,depth_image,points,camera_info}` 발행, frame_id `camera_link0`(브리지 포크: `greenhouse_sim/launch/ros_ign_bridge.launch.py`). RViz2 PointCloud2/Image 확인.
 - [ ] **(d) 환경 리셋 경로 확정:** ⚠️ proposal §4.3의 `/reset_world`는 **Gazebo Classic 문법**. 본 ws는 Ignition Fortress이므로 **`/world/greenhouse_world/control`(WorldControl reset)** 또는 엔티티 재배치용 **`/world/greenhouse_world/set_pose`** 를 사용(ros_gz 브리지 또는 ign transport 직접 호출). 로봇·타겟 위치 초기화 방식 결정.
-- [ ] **(e) 경량 학습 world 옵션:** 온실 잎은 이미 box collision이라 LiDAR엔 동일하고 텍스처는 렌더 비용만 추가. 헤드리스 LiDAR 학습 처리량을 위해 `gen_greenhouse_world.py`에 **텍스처 off / primitive-only** 변형 옵션 추가 권장. (카메라/정성평가용으로는 텍스처 온실 유지.)
+- [ ] **(e) 경량 학습 world 옵션:** 온실 잎은 이미 box collision이라 LiDAR엔 동일하고 텍스처는 렌더 비용만 추가. 학습 처리량을 위해 `gen_greenhouse_world.py`에 **텍스처 off / primitive-only** 변형 옵션 추가 권장. (현행 상태공간은 뎁스 범퍼용 카메라 렌더가 필수라 카메라 자체는 끄지 않음 — 텍스처 off는 렌더 비용 절감 목적. 정성평가용으로는 텍스처 온실 유지.)
 
 ## 3단계 — RL 환경 패키지 (`rosorin_rl`)
 - [ ] 새 패키지 `src/rosorin_rl/` 생성 (제조사 monorepo와 분리).
 - [ ] RL 라이브러리 설치: `stable-baselines3` / `gymnasium` / `torch` (컨테이너에 미설치 상태).
 - [ ] **커스텀 Gymnasium Env(= ROS2 노드)** 작성:
-  - `_get_obs()`: `/scan`(→ LiDAR 기하 특징 4개로 압축) + 타겟 좌표 토픽 + `/imu`·`/odom`(로봇 속도) 구독 → 10차원 정제 후 **3프레임 스택 → 30차원**. 노이즈 주입.
+  - `_get_obs()`: `/scan`(→ 6구역 최솟값 압축) + 타겟 특징 토픽(2단계 (b)) + `/depth_cam/depth_image`(하단 뎁스 범퍼 3D — intrinsic/extrinsic 활용은 `rl_state_space.md` §2.5) + `/imu`·`/odom`(로봇 속도) 구독 → 16차원 정제 후 **3프레임 스택 → 48차원**. 노이즈 주입.
   - `step(action)`: `[ax,ay,aω]`를 물리값으로 스케일링 → `/controller/cmd_vel`(Twist, vx/vy/ω) 발행 → 일정 시간(ROS rate) 진행 후 보상 계산.
   - `reset()`: 2단계 (d)의 Ignition 서비스로 로봇·타겟 초기화, 상태 버퍼 비움.
-- [ ] 보상 함수(`R_tracking`/`R_safety`/`R_pose`)·종료조건 구현 (proposal §5.3~5.4).
+- [ ] 보상 함수(`R_tracking`/`R_safety`/`R_pose_center`)·모드 전환·종료조건 구현 (`rl_reward_function.md`·`rl_train_senarioes.md`).
 
 ## 4단계 — 학습 / 평가
 - [ ] **SAC(1순위)** 로 학습, **PPO(베이스라인)** 와 비교 (둘 다 SB3).
@@ -57,7 +61,7 @@
 - [ ] 학습 정책을 실물 ROSOrin(Jetson Orin Nano)에 포팅, 기초 추종 성능 검증.
 
 ## 메모
-- 토픽/제어 인터페이스: `CLAUDE.md` 표 단일 출처.
-- RL 설계(MDP/보상/알고리즘): `rl_design/0_project_proposal.md` 단일 출처.
+- 토픽/제어 인터페이스: `README.md`·`docs/environment.md` 표 단일 출처.
+- RL 설계: 개요·알고리즘은 `rl_design/0_project_proposal.md`, 수치·수식은 세부 노트(`rl_state_space.md` 등) 단일 출처.
 - 온실 레이아웃 변경·재현: `gen_greenhouse_world.py` 파라미터 + `RANDOM_SEED`.
 - Ignition 전용 — 리셋/서비스/리소스경로에 Gazebo Classic 문법(`/reset_world`, `gazebo_ros`, `GAZEBO_RESOURCE_PATH`) 혼용 금지.
