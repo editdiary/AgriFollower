@@ -9,9 +9,11 @@
   is not too long for the 0.8 m greenhouse aisle.
 
   Sensor intrinsics (LiDAR range/FOV/resolution, camera FOV/resolution) are NOT
-  scaled — they model the real MS200 / aurora hardware — so the vendor
-  lidar/camera gazebo files are included unchanged. Only the geometry (meshes,
-  mounts, wheels, inertia) and the drive plugin parameters are scaled.
+  scaled — they model the real MS200 / aurora hardware. The lidar/camera gazebo
+  files are greenhouse_sim forks that match the real sensors more closely than
+  the vendor ones (lidar: 360° like the real MS200; camera: rgbd_camera).
+  Only the geometry (meshes, mounts, wheels, inertia) and the drive plugin
+  parameters are scaled.
 -->
 <robot name="robot" xmlns:xacro="http://ros.org/wiki/xacro">
     <xacro:arg name="sim_ign" default="true"/>
@@ -27,8 +29,8 @@
         <xacro:include filename="$(find greenhouse_sim)/urdf/wheel_scaled.xacro"/>
     </xacro:if>
 
-    <!-- lidar (vendor intrinsics, unchanged — same lidar_frame name) -->
-    <xacro:include filename="$(find robot_gazebo)/urdf/lidar.gazebo.xacro"/>
+    <!-- lidar: 360° fork (벤더는 ~156°로 제한, 실물 MS200 은 360°). lidar_frame 동일 -->
+    <xacro:include filename="$(find greenhouse_sim)/urdf/lidar_scaled.gazebo.xacro"/>
     <!-- camera: RGB-D (rgbd_camera). 벤더 camera.gazebo.xacro(RGB 전용) 대체. camera_link0 동일 -->
     <xacro:include filename="$(find greenhouse_sim)/urdf/depth_cam_scaled.gazebo.xacro"/>
 

@@ -47,10 +47,10 @@ HOST=/  MASTER=/           # 멀티로봇(robot_xxx)용, 현재 비활성
 - ⚠️ 위 `/depth_cam/*` 4토픽은 **greenhouse 스택**(`greenhouse_sim/launch/ros_ign_bridge.launch.py`, RGB-D `rgbd_camera`) 기준. 벤더 `robot_gazebo` 브리지는 여전히 RGB 전용(`/depth_cam/depth_cam` Image)이다.
 
 ## 센서 스펙 (URDF/xacro 검증값)
-RViz2로 발행 확인된 센서 구성. 상세 정의는 `robot_gazebo/urdf/{lidar,imu}.gazebo.xacro`, 카메라는 `greenhouse_sim/urdf/depth_cam_scaled.gazebo.xacro`.
+RViz2로 발행 확인된 센서 구성. 상세 정의는 IMU는 `robot_gazebo/urdf/imu.gazebo.xacro`, LiDAR/카메라는 `greenhouse_sim/urdf/{lidar_scaled,depth_cam_scaled}.gazebo.xacro`.
 | 센서 | Ignition 타입 | 주요 스펙 | 비고 |
 |------|---------------|-----------|------|
-| LiDAR (MS200) | `gpu_lidar` | 270 samples, ±~78°(±1.36 rad), 10 Hz, 0.15–12 m | `/scan`(+`/scan/points`) |
+| LiDAR (MS200) | `gpu_lidar` | 450 samples, 360°(±π, 0.8°/sample), 10 Hz, 0.15–12 m | `/scan`(+`/scan/points`) — greenhouse 포크. 벤더 파일은 ~156°(±1.36 rad)·270 samples 로 제한돼 있었음(실물 MS200 은 360°) |
 | IMU | `imu` | 50 Hz | `/imu` |
 | 카메라 (aurora) | `rgbd_camera` | 640×400, FOV 60°(1.047 rad), 30 Hz, clip 0.1–10 m | **RGB-D** (greenhouse 스택) — `/depth_cam/{image,depth_image,points,camera_info}`, frame_id `camera_link0`. 정의: `greenhouse_sim/urdf/depth_cam_scaled.gazebo.xacro` |
 - 구동: `MecanumDrive` 플러그인 — `/controller/cmd_vel`(Twist)의 `linear.x/linear.y/angular.z`로 홀로노믹 제어.

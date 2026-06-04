@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+  lidar_scaled.gazebo.xacro — lidar_frame 에 360° gpu_lidar 센서를 정의한다.
+  Fork of src/simulations/robot_gazebo/urdf/lidar.gazebo.xacro (vendor, do-not-modify).
+
+  벤더 파일은 FOV 를 전방 ±1.36263rad(±78°, 합 ~156°)·270 samples 로 제한해 두었는데,
+  실물 Oradar MS200 은 360° 회전식이라 Sim-to-Real 일치를 위해 전방위로 되돌린다.
+  samples=450 은 실물 스펙(측정 4500Hz ÷ 스캔 10Hz = 450 pts/rev, 0.8°/pt) 기준.
+  topic/update_rate/range/noise/frame 은 벤더값 그대로 (브리지 변경 불필요).
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="gpu_lidar">
+    <gazebo reference="lidar_frame">
+        <sensor name="gpu_lidar" type="gpu_lidar">
+            <topic>scan</topic>
+            <update_rate>10</update_rate>
+            <ignition_frame_id>lidar_frame</ignition_frame_id>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>450</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-3.14159265</min_angle>
+                        <max_angle>3.14159265</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.15</min>
+                    <max>12.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.01</stddev>
+                </noise>
+            </ray>
+            <alwaysOn>1</alwaysOn>
+            <visualize>true</visualize>
+        </sensor>
+    </gazebo>
+
+</robot>
