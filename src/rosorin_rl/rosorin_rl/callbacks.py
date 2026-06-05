@@ -41,6 +41,7 @@ class RLMetricsCallback(BaseCallback):
     def _reset_ep_acc(self):
         self._ep_acc = {
             'r_track': [], 'r_approach': [], 'r_safety': [], 'r_pose': [],
+            'r_smooth': [], 'r_gaze': [],
             'abs_ax': [], 'abs_ay': [], 'abs_aw': [],
             'd_t': [], 'in_aisle': [],
         }
@@ -55,7 +56,8 @@ class RLMetricsCallback(BaseCallback):
 
         # --- 스텝 단위 누적 ---
         acc = self._ep_acc
-        for k in ('r_track', 'r_approach', 'r_safety', 'r_pose', 'd_t'):
+        for k in ('r_track', 'r_approach', 'r_safety', 'r_pose', 'r_smooth',
+                  'r_gaze', 'd_t'):
             if k in info:
                 acc[k].append(float(info[k]))
         if 'in_aisle' in info:
@@ -82,6 +84,8 @@ class RLMetricsCallback(BaseCallback):
                 'reward/r_approach_mean': 'r_approach',
                 'reward/r_safety_mean': 'r_safety',
                 'reward/r_pose_mean': 'r_pose',
+                'reward/r_smooth_mean': 'r_smooth',
+                'reward/r_gaze_mean': 'r_gaze',
                 'action/abs_ax_mean': 'abs_ax',
                 'action/abs_ay_mean': 'abs_ay',     # 매카넘 게걸음 사용량
                 'action/abs_aw_mean': 'abs_aw',

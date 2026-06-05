@@ -3,17 +3,25 @@
 설계 출처: docs/rl_design/rl_reward_function.md (수식의 단일 출처)
 계수 수치: src/rosorin_rl/config/rl_params.yaml (튜닝 출발점)
 
-[ 전체 구조 (§2 + 2차 조정) ]
-    R_t = w1·R_tracking + R_approach + w2·R_safety + w3·R_pose_center
+[ 전체 구조 (§2 + 2차·5차·6차 조정) ]
+    R_t = w1·R_tracking + R_approach + w2·R_safety + w3_eff·R_pose_center
+          + R_smooth + R_gaze
 
   - R_tracking   : 목표 거리(0.65m) 유지 — 가우시안 형태 연속 보상 (§3.1)
   - R_approach   : 접근 shaping k·(d_prev−d_t) — 원거리에서도 추적 기울기 제공
                    (2차 조정에서 추가 — 학습 정체 진단 후. compute() 내 주석 참조)
   - R_safety     : 전방/측면 임계치 이원화, 클리핑된 2차 페널티 (§3.2)
-  - R_pose_center: 통로 정렬 + 중앙 유지 (§3.3) — 통로 내부 모드에서만 활성 (§4)
+                   ⚠️ 임계값은 LiDAR 'raw 거리' 기준 — 풋프린트(반폭 0.19m 등)를
+                   더한 값으로 잡아야 충돌 전에 실제로 발동한다 (5차 조정에서 보정)
+  - R_pose_center: 통로 정렬 + 중앙 유지 (§3.3) — 통로 진입에 따라 선형 램프로
+                   활성 (§4, 5차 조정: 하드 스위치 → 램프. 입구 불연속 벌점 제거)
+  - R_smooth     : 행동 변화 페널티 −k·‖a_t−a_{t−1}‖² (5차 조정: 잔떨림 비용 부여)
+  - R_gaze       : 타겟 주시 −η·|θ_t| (6차 조정) — lost 절벽(FOV 이탈 15프레임
+                   → −50)의 dense 선행 신호. 타겟을 화면 중앙에 유지하도록 유도해
+                   불필요한 ω 사용("고개 휙 돌림")을 억제. 비가시 시 0.
 
-[ 종료 조건 (§5) ]
-  성공(+100) / 환경충돌(-100) / 타겟충돌(-100) / 타겟이탈(-50) / 정체(-50)
+[ 종료 조건 (§5) ]  — 스칼라 값은 rl_params.yaml terminal 섹션이 단일 출처
+  성공(+) / 환경충돌(−) / 타겟충돌(−) / 타겟이탈(−) / 정체(−)
 """
 
 import math
@@ -31,11 +39,14 @@ class RewardCalculator:
         self.beta_f, self.beta_s = rw['beta_f'], rw['beta_s']
         self.gamma_, self.zeta = rw['gamma'], rw['zeta']
         self.k_approach = rw['k_approach']   # 접근 shaping 계수 (2차 조정에서 추가)
+        self.k_smooth = rw['k_smooth']       # 행동 변화 페널티 계수 (5차 조정에서 추가)
+        self.eta = rw['eta']                 # 타겟 주시 페널티 계수 (6차 조정에서 추가)
 
         th = cfg['thresholds']
-        self.front_th = th['front']            # 전방 안전 임계 0.3m
-        self.side_th = th['side']              # 측면 안전 임계 0.05m
+        self.front_th = th['front']            # 전방 안전 임계 (raw 거리 기준)
+        self.side_th = th['side']              # 측면 안전 임계 (raw 거리 기준)
         self.aisle_mode_th = th['aisle_mode']  # 통로/교차로 모드 전환 1.5m
+        self.aisle_ramp = th['aisle_ramp']     # 모드 전환 선형 램프 폭 (5차 조정)
         self.collision_margin = th['collision_margin']  # 외곽 기준 충돌 여유 임계
 
         tg = cfg['target']
@@ -59,21 +70,24 @@ class RewardCalculator:
         self.reward_history = deque(maxlen=self.stuck_window)  # 정체 감지용
         self.lost_count = 0                                    # 연속 미검출 스텝 수
         self.d_prev = None                                     # 접근 shaping 용 직전 거리
+        self.a_prev = None                                     # 행동 변화 페널티용 직전 행동
 
     # ------------------------------------------------------------------
-    def compute(self, *, d_t, visible, d_front_merged, d_left, d_right,
-                yaw_err, env_margin, step_idx):
+    def compute(self, *, d_t, visible, theta_t, d_front_merged, d_left, d_right,
+                yaw_err, env_margin, step_idx, action=None):
         """한 스텝의 보상과 종료 여부 계산.
 
         Args:
             d_t:            타겟 실측 거리 [m] (/target/features — 노이즈 포함)
             visible:        이번 스텝에 타겟이 검출됐는지 (bool)
+            theta_t:        타겟 방위각 [rad] (카메라 광축 기준 — R_gaze 용)
             d_front_merged: 전방 센서 퓨전 거리 = min(LiDAR 정면, 뎁스범퍼 중앙) [m] (§3.2)
             d_left/d_right: 좌/우 측면 최소 거리 [m] (±90° 창)
             yaw_err:        |로봇 헤딩 - 통로 방향| [rad] (§3.3)
             env_margin:     로봇 '외곽' 기준 최소 장애물 여유 [m]
                             (obs_pipeline.env_margin — 직사각형 풋프린트 반영, 3차 수정)
             step_idx:       현재 에피소드 내 스텝 번호 (0부터)
+            action:         이번 스텝의 정규화 행동 [ax, ay, aω] (행동 변화 페널티용)
 
         Returns:
             (reward, terminated, info)
@@ -107,14 +121,41 @@ class RewardCalculator:
         r_safety = r_safe_front + r_safe_side
 
         # --- R_pose_center (§3.3): 통로 정렬 + 중앙 유지 ---
-        r_pose = -self.gamma_ * abs(yaw_err) - self.zeta * abs(d_left - d_right)
+        # |좌-우| 항은 상한 1.0m 클립 (5차 조정): 입구처럼 한쪽만 트인 곳에서
+        # 큰 비대칭이 과도한 벌점으로 번지는 것을 방지.
+        r_pose = (-self.gamma_ * abs(yaw_err)
+                  - self.zeta * min(abs(d_left - d_right), 1.0))
 
-        # --- 모드 전환 (§4): 좌우가 모두 넓으면 '교차로 모드' → 자세 보상 비활성 ---
-        in_aisle = min(d_left, d_right) < self.aisle_mode_th
-        w3_eff = self.w3 if in_aisle else 0.0
+        # --- 모드 전환 (§4, 5차 조정): 하드 스위치 → 선형 램프 ---
+        # 기존 on/off 는 통로 입구(1.5m 경계)에서 보상이 불연속으로 점프해
+        # "들어가는 순간 벌점" 구조였다 (1차 학습 입구 망설임의 원인 중 하나).
+        # d_side 가 aisle_mode_th 에서 (aisle_mode_th − aisle_ramp)까지 줄어드는
+        # 동안 0→1 로 서서히 켠다. 통로 내부(d_side≈0.4m)에서는 완전 활성.
+        d_side_min = min(d_left, d_right)
+        in_aisle = d_side_min < self.aisle_mode_th       # (로깅/진단용 불리언)
+        ramp = min(max((self.aisle_mode_th - d_side_min) / self.aisle_ramp, 0.0),
+                   1.0)
+        w3_eff = self.w3 * ramp
+
+        # --- R_smooth (5차 조정): 행동 변화 페널티 −k·‖a_t − a_{t−1}‖² ---
+        # 잔떨림(스텝마다 행동 반전)에 비용을 부여해 매끄러운 주행 유도.
+        # 에피소드 첫 스텝(직전 행동 없음)은 0.
+        if action is None or self.a_prev is None:
+            r_smooth = 0.0
+        else:
+            r_smooth = -self.k_smooth * sum(
+                (a - b) ** 2 for a, b in zip(action, self.a_prev))
+        if action is not None:
+            self.a_prev = list(action)
+
+        # --- R_gaze (6차 조정): 타겟 주시 −η·|θ_t| ---
+        # lost 절벽(FOV 이탈 15프레임 → −50)으로 가기 전의 dense 선행 신호.
+        # 타겟을 화면 중앙에 유지할수록 0에 가깝고, FOV 가장자리(±30°≈0.52rad)
+        # 에서 −η·0.52. 비가시 시 θ_t 는 last-known(stale)이므로 0 처리.
+        r_gaze = -self.eta * abs(theta_t) if visible else 0.0
 
         reward = (self.w1 * r_track + r_approach
-                  + self.w2 * r_safety + w3_eff * r_pose)
+                  + self.w2 * r_safety + w3_eff * r_pose + r_smooth + r_gaze)
 
         # ===== 2) 종료 조건 판정 (§5) — 우선순위: 충돌 > 이탈 > 정체 > 성공 =====
         terminal = None
@@ -152,7 +193,9 @@ class RewardCalculator:
             'r_track': r_track,
             'r_approach': r_approach,
             'r_safety': r_safety,
-            'r_pose': r_pose if in_aisle else 0.0,
+            'r_pose': r_pose * ramp,    # 램프 반영 후 실효 기여분 (w3 가중 전)
+            'r_smooth': r_smooth,
+            'r_gaze': r_gaze,
             'in_aisle': in_aisle,
             'd_t': d_t,
             'd_front_merged': d_front_merged,

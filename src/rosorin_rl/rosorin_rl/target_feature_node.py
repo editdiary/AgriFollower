@@ -49,7 +49,7 @@ class TargetFeatureNode(Node):
 
         # --- 파라미터 ---
         self.declare_parameter('noise_pct', 0.03)      # 가우시안 노이즈 표준편차 (3%)
-        self.declare_parameter('marker_height', 0.35)  # 마커 가정 높이 [m]
+        self.declare_parameter('marker_height', 0.20)  # 마커 가정 높이 [m]
         self.declare_parameter('robot_entity', 'robot')         # ignition 모델 이름
 
         self.noise_pct = self.get_parameter('noise_pct').value

@@ -1,11 +1,16 @@
 """스케일된 ROSOrin 을 스폰하는 런치.
 
-robot_gazebo/launch/spwan_model.launch.py 를 본떠 작성했으며 두 가지가 다르다:
+robot_gazebo/launch/spwan_model.launch.py 를 본떠 작성했으며 세 가지가 다르다:
 1) robot_description 을 생성하는 xacro 를 제조사 robot.gazebo.xacro 대신 이 패키지의
    urdf/robot_scaled.gazebo.xacro (균일 확대 포크) 로 가리킨다.
 2) URDF 에 <ros2_control> 태그가 없어 ros2_control_node/spawner 가 즉시 죽고 로그를
    폭주시키므로 제거했다. 로봇은 MecanumDrive 플러그인으로 구동되고, /joint_states 는
    gz JointStatePublisher 플러그인→브리지로 공급되므로 휠 TF·표시에 영향 없다.
+3) joint_state_publisher 노드를 제거했다. source_list 가 자기 발행 토픽과 같은
+   /joint_states 라 브리지 공급분을 받아 같은 토픽에 되쏘는 중복 발행이었다
+   (브리지 공급만으로 충분. 참고: "Moved backwards in time" 경고 폭주의 원인은
+   이 노드가 아니라 이전 세션에서 살아남은 좀비 parameter_bridge 가 /clock 을
+   이중 발행한 것 — docs/troubleshooting.md 참조).
 """
 
 import os
@@ -53,19 +58,6 @@ def launch_setup(context):
         ],
     )
 
-    joint_state_publisher_node = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        output='screen',
-        parameters=[
-            {
-                'source_list': ['/joint_states'],
-                'rate': 20.0,
-                'use_sim_time': use_sim_time
-            }
-        ],
-    )
-
     ignition_spawn_entity = Node(
         package='ros_ign_gazebo',
         executable='create',
@@ -87,7 +79,6 @@ def launch_setup(context):
     return [
         use_sim_time_arg,
 
-        joint_state_publisher_node,
         robot_state_publisher_node,
         ignition_spawn_entity,
     ]

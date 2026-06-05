@@ -305,12 +305,14 @@ class FollowTargetEnv(gym.Env):
         reward, terminated, info = self.reward_calc.compute(
             d_t=raw['d_t'],
             visible=raw['visible'],
+            theta_t=raw['theta_t'],
             d_front_merged=raw['d_front_merged'],
             d_left=raw['d_left'],
             d_right=raw['d_right'],
             yaw_err=raw['yaw_err'],
             env_margin=raw['env_margin'],
             step_idx=self.step_idx,
+            action=a.tolist(),   # 행동 변화 페널티(R_smooth)용 정규화 행동
         )
         self.step_idx += 1
 
@@ -375,6 +377,7 @@ class FollowTargetEnv(gym.Env):
                          float(depth3.min()))
 
         raw = {'d_t': d_t, 'visible': visible,
+               'theta_t': theta_t,   # 타겟 방위각 — R_gaze(주시 보상, 6차)용
                'd_front_merged': d_front_merged,
                'd_left': d_left, 'd_right': d_right,
                'yaw_err': yaw_err, 'env_margin': env_margin}

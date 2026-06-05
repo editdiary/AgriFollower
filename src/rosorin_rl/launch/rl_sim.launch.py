@@ -102,7 +102,8 @@ def generate_launch_description():
         parameters=[{
             'use_sim_time': True,
             'noise_pct': 0.03,        # 도메인 랜덤화 노이즈 (proposal §4.4)
-            'marker_height': 0.35,    # 마커 가정 높이 [m]
+            'marker_height': 0.20,    # 마커 가정 높이 [m] (0.35→0.20: 추종 거리에서
+                                      # 화면 상단 잘림 보정 — worker_target.sdf 주석 참조)
         }],
     )
 

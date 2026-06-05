@@ -106,7 +106,7 @@ def extract_pose(tf_msg, name):
 
 
 def world_to_target_features(robot_x, robot_y, robot_yaw,
-                             target_x, target_y, marker_z=0.35):
+                             target_x, target_y, marker_z=0.20):
     """월드 좌표(ground truth) → 카메라 기준 타겟 특징 [x_norm, y_norm, d_t, θ_t].
 
     실물에서는 RGB-D 영상에서 마커(AprilTag)를 검출해 이 4개 값을 얻지만(rl_state_space.md §2.1),
@@ -117,8 +117,12 @@ def world_to_target_features(robot_x, robot_y, robot_yaw,
         robot_x/y/yaw: 로봇 base_link 의 월드 pose
         target_x/y:    타겟(원기둥) 중심의 월드 위치
         marker_z:      마커가 붙어 있다고 가정하는 높이 [m].
-                       카메라(z=0.168m, 수평 마운트)의 수직 화각(±19.8°) 안에
-                       근거리(0.65m)에서도 들어오는 높이로 기본 0.35m 채택.
+                       카메라(z=0.168m, 수평 마운트)의 수직 화각(±19.8°)에 마커
+                       '전체'(±0.08m)가 근거리에서도 들어오도록 기본 0.20m 채택.
+                       (초기값 0.35는 추종 거리 0.65m에서 마커 중심이 화면 상단
+                        경계에 걸려 절반 잘림 — RViz 실측 후 인하. 0.20은 카메라
+                        0.31m 근접까지 전체 시야 유지. ⚠️ 인하로 GT 역산 d_t 가
+                        ~2.6cm 작아짐 — 수직 오프셋 0.182→0.032m. 노이즈 3% 수준.)
 
     Returns:
         dict(x_norm, y_norm, d_t, theta_t, visible)

@@ -7,6 +7,41 @@
 
 ---
 
+## `robot_state_publisher` "Moved backwards in time" 경고 폭주 (해결, 2026-06-05)
+
+**증상**
+`rl_sim.launch.py` 실행 직후부터 `[robot_state_publisher] Moved backwards in time, re-publishing joint transforms!`
+경고가 초당 수십 건씩 무한 반복. 시뮬 자체는 동작하나 로그가 묻히고 TF 재발행이 계속 발생.
+
+**배경**
+launch를 Ctrl+C로 종료해도 가끔 `parameter_bridge` 프로세스만 살아남는 경우가 있다(gz 서버는 죽고 브리지만 고아화).
+gz-transport는 머신 전역 디스커버리라, 좀비 브리지가 **새로 띄운 시뮬의 gz 토픽에도 자동으로 붙는다**.
+
+**원인**
+이전 세션의 좀비 `parameter_bridge`가 새 시뮬의 `/clock`을 같이 발행 → ROS `/clock` 발행자가 2개가 되어
+두 스트림이 수~수십 ms 어긋나게 겹침 → sim time이 비단조(역행) → `use_sim_time` 노드(robot_state_publisher)가
+시계가 뒤로 갔다고 판단해 경고 폭주.
+
+**진단(요약)**
+- `ros2 topic echo /clock` → 타임스탬프가 역행하는 구간 확인 (…861ms → 847ms → 다시 진행).
+- `ros2 topic info /clock --verbose` → **Publisher count: 2** (둘 다 `ros_gz_bridge`).
+- `ps aux | grep parameter_bridge` → 이전 세션 시각에 시작된 브리지 2개 잔존.
+- 기각: launch의 `joint_state_publisher` 중복 발행 — 제거해도 경고 지속(단, 그 자체로 불필요한 중복이라 별도 제거함).
+
+**해결**
+좀비 브리지 kill. 이후 `/clock` 발행자 수가 2로 계속 보이면 `ros2 daemon stop`으로 데몬 캐시 갱신(실제는 1).
+```bash
+ps aux | grep parameter_bridge   # 이전 세션 잔존 프로세스 확인
+kill <PID...>
+ros2 daemon stop                 # topic info 가 stale 카운트를 보여줄 때
+```
+재발 예방: 시뮬 재실행 전 잔존 프로세스 확인 습관. (launch 종료 후 `ps aux | grep -E "parameter_bridge|ign gazebo"`)
+
+**검증**
+좀비 kill 후 `/clock` Publisher count = 1, 동일 시뮬 15초 관찰 동안 경고 0건 (kill 전 ~45건/초).
+
+---
+
 ## `/depth_cam` 대각선(45/135/225/315°) 회색 렌더 (해결, 2026-06-03)
 
 **증상**

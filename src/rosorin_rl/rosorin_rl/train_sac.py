@@ -27,6 +27,7 @@ import rclpy
 from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.callbacks import CheckpointCallback
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.utils import get_latest_run_id
 
 from rosorin_rl.callbacks import RLMetricsCallback
 from rosorin_rl.follow_env import FollowTargetEnv
@@ -59,10 +60,22 @@ def main():
     cfg = env.cfg
     # Monitor: 에피소드 리턴/길이를 SB3 로거(ep_rew_mean 등)에 기록하는 래퍼.
     # - filename: 에피소드별 (리턴, 길이, 경과시각) + 종료사유를 CSV 로도 남김
-    #   → 학습 후 pandas 로 자유 분석 (rl_logs/monitor.csv)
+    #   → 학습 후 pandas 로 자유 분석 (rl_logs/monitor_{algo}_{N}.csv)
     # - info_keywords: 마지막 info 에서 함께 기록할 키
-    env = Monitor(env, filename=os.path.join(args.logdir, 'monitor.csv'),
+    # 파일명은 TB 런 번호(sac_N)와 일치시킨다. 고정 경로(monitor.csv)는 SB3 Monitor
+    # 가 truncate 모드로 열어 다음 학습 시작 시 이전 런 CSV 가 소실되는 문제가 있었음.
+    # SB3 configure_logger 와 동일 규칙: 새 런이면 +1, resume(reset_num_timesteps=False)
+    # 이면 기존 번호 재사용 — 단 resume 시 기존 CSV 를 덮어쓰지 않도록 접미사를 붙인다.
+    run_id = get_latest_run_id(args.logdir, args.algo) + (0 if args.resume else 1)
+    monitor_path = os.path.join(args.logdir, f'monitor_{args.algo}_{run_id}.csv')
+    n_resume = 0
+    while os.path.exists(monitor_path):
+        n_resume += 1
+        monitor_path = os.path.join(
+            args.logdir, f'monitor_{args.algo}_{run_id}_resume{n_resume}.csv')
+    env = Monitor(env, filename=monitor_path,
                   info_keywords=('terminal',))
+    print(f'에피소드 CSV: {monitor_path}')
 
     # ---------------- 모델 생성 ----------------
     # device: GPU(cuda) 사용 가능하면 자동 선택. 48차원 MLP 라 CPU 도 충분히 빠름.
