@@ -12,6 +12,8 @@
   ros2 run rosorin_rl train_sac                          # SAC, 10만 스텝
   ros2 run rosorin_rl train_sac --algo ppo               # PPO 베이스라인
   ros2 run rosorin_rl train_sac --timesteps 5000         # 짧은 검증 런
+  ros2 run rosorin_rl train_sac --warm-start models/sac_2/sac_follow_final.zip
+                                # 보상 변경 후 재학습: 가중치만 이식, 버퍼·런 초기화
 
 [ 모니터링 ]
   tensorboard --logdir ~/rosorin_sim_ws/rl_logs
@@ -49,7 +51,15 @@ def main():
                         help='체크포인트 저장 주기 (스텝)')
     parser.add_argument('--resume', default=None,
                         help='이어서 학습할 모델(.zip) 경로')
+    parser.add_argument('--warm-start', default=None, metavar='ZIP',
+                        help='정책 가중치만 이식해 "새 런"으로 시작 (.zip 경로). '
+                             'resume 과 달리 Replay Buffer·옵티마이저·ent_coef·스텝 '
+                             '카운터·런 번호를 모두 초기화한다. 보상 설계를 바꾼 뒤 '
+                             '재학습할 때 사용 — 이전 버퍼의 보상값은 무효이므로 '
+                             'resume 하면 안 된다 (rl_code_guide.md §5 참조).')
     args = parser.parse_args()
+    if args.resume and args.warm_start:
+        parser.error('--resume 과 --warm-start 는 동시에 쓸 수 없습니다.')
 
     os.makedirs(args.logdir, exist_ok=True)
     os.makedirs(args.modeldir, exist_ok=True)
@@ -138,6 +148,18 @@ def main():
                 tensorboard_log=args.logdir,
                 verbose=1,
             )
+
+    # ---------------- 웜스타트 (7차): 정책 가중치만 이식 ----------------
+    # SB3 SAC/PPO 의 policy 객체는 actor·critic·critic_target 을 모두 포함하므로
+    # load_state_dict 한 번이면 네트워크 전체가 이식된다. 버퍼/옵티마이저/ent_coef
+    # 는 위에서 새로 만든 것을 유지 → 바뀐 보상 체계에서 깨끗하게 재적응.
+    if args.warm_start:
+        algo_cls = SAC if args.algo == 'sac' else PPO
+        warm = algo_cls.load(args.warm_start, device=model.device)
+        model.policy.load_state_dict(warm.policy.state_dict())
+        del warm
+        print(f'웜스타트: {args.warm_start} 의 정책 가중치 이식 '
+              f'(버퍼/옵티마이저/스텝 카운터는 초기화, 새 런 {args.algo}_{run_id})')
 
     # ---------------- 학습 ----------------
     ckpt_cb = CheckpointCallback(

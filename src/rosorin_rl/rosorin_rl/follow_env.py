@@ -259,8 +259,14 @@ class FollowTargetEnv(gym.Env):
                                         'target_controller 가 떠 있는지 확인.')
 
         # ③ 로봇 텔레포트 (Ignition Fortress set_pose — roadmap 2단계 (d))
+        #    [7차] reset_y 에 ±jitter 무작위 횡오프셋: 고정 스폰이 만든 편향 궤적
+        #    고착을 깨고 능동 중앙 보정을 학습하도록 강제 (도메인 랜덤화).
+        #    self.np_random 은 super().reset(seed=...) 가 시드 — 재현 가능.
         rb = self.cfg['robot']
-        self._teleport('robot', rb['reset_x'], rb['reset_y'], rb['reset_z'],
+        jitter = rb.get('reset_y_jitter', 0.0)
+        reset_y = rb['reset_y'] + (
+            float(self.np_random.uniform(-jitter, jitter)) if jitter else 0.0)
+        self._teleport('robot', rb['reset_x'], reset_y, rb['reset_z'],
                        rb['reset_yaw'])
 
         # ④ 내부 상태 초기화

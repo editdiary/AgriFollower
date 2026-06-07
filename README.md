@@ -164,6 +164,7 @@ rosorin_sim_ws/
 > 텍스처(`greenhouse_sim/media/.../*.jpg`)는 **우리 자체 에셋**이라 repo에 포함한다.
 
 ## 문서
+- [`docs/runbook.md`](docs/runbook.md) — **런북: 상황별 실행 명령어 모음** (학습 시작/재개·모니터링·종료 후 확인·평가 — 복사해서 바로 실행)
 - [`docs/rl_design/`](docs/rl_design/) — **RL 설계 문서** 모음
   - [`0_project_proposal.md`](docs/rl_design/0_project_proposal.md) — RL 설계 개요 (목적·파이프라인·MDP 개요, SAC·PPO, Sim-to-Real)
   - [`rl_state_space.md`](docs/rl_design/rl_state_space.md) · [`rl_reward_function.md`](docs/rl_design/rl_reward_function.md) · [`rl_train_senarioes.md`](docs/rl_design/rl_train_senarioes.md) — 상태/보상/학습 시나리오 세부 노트 (**구체 수치·수식의 단일 출처**)

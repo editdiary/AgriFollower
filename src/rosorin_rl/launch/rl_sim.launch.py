@@ -87,7 +87,7 @@ def generate_launch_description():
             # LaunchConfiguration 은 문자열이므로 int 로 명시 변환
             'scenario': ParameterValue(scenario, value_type=int),
             # 보행 속도·왕복 구간·시작 위치는 config/rl_params.yaml 의 target 섹션과 일치시킬 것
-            'speed': 0.05,        # 커리큘럼 0단계 (config 주석 참조)
+            'speed': 0.1,         # 커리큘럼 1단계 (7차, config 주석 참조)
             'aisle_x_min': 0.9,
             'aisle_x_max': 6.3,
             'reset_x': 0.6,       # 통로 입구

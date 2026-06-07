@@ -24,6 +24,7 @@ ROSOrin(매카넘) **Ignition Gazebo 시뮬 + 강화학습** 워크스페이스.
 - 라이선스: 우리 코드는 Apache-2.0(`LICENSE`/`NOTICE`). 제조사 코드는 제외 — 상세는 `README.md` "제조사 코드 & 에셋"·"라이선스".
 
 ## 어디에 뭐가 있나 (필요할 때 참조)
+- **상황별 실행 명령어 (학습 시작/재개·모니터링·종료 후 확인·평가 런북)** → `docs/runbook.md`
 - 프로젝트 개요·실행 환경·빌드/실행·온실 재생성·토픽표 → `README.md`
 - RL 설계 (MDP·보상·SAC/PPO·Sim-to-Real) → `docs/rl_design/` (개요 `0_project_proposal.md` · 구체 수치/수식의 단일 출처는 상태/보상/시나리오 세부 노트)
 - RL 코드 (아키텍처·검증 체크리스트·튜닝 표·**시뮬 보정 사항**: 매카넘 y반전·뎁스범퍼 바닥차감·set_pose 타겟) → `docs/rl_code_guide.md`

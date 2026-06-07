@@ -15,6 +15,8 @@
                    더한 값으로 잡아야 충돌 전에 실제로 발동한다 (5차 조정에서 보정)
   - R_pose_center: 통로 정렬 + 중앙 유지 (§3.3) — 통로 진입에 따라 선형 램프로
                    활성 (§4, 5차 조정: 하드 스위치 → 램프. 입구 불연속 벌점 제거)
+                   (7차 조정: yaw 항은 d_side_min 램프, 중앙 항은 d_side_max 게이트로
+                   분리 — 입구에서 한쪽만 트인 상태의 |Δ좌우| 포화 벌점 제거)
   - R_smooth     : 행동 변화 페널티 −k·‖a_t−a_{t−1}‖² (5차 조정: 잔떨림 비용 부여)
   - R_gaze       : 타겟 주시 −η·|θ_t| (6차 조정) — lost 절벽(FOV 이탈 15프레임
                    → −50)의 dense 선행 신호. 타겟을 화면 중앙에 유지하도록 유도해
@@ -47,6 +49,8 @@ class RewardCalculator:
         self.side_th = th['side']              # 측면 안전 임계 (raw 거리 기준)
         self.aisle_mode_th = th['aisle_mode']  # 통로/교차로 모드 전환 1.5m
         self.aisle_ramp = th['aisle_ramp']     # 모드 전환 선형 램프 폭 (5차 조정)
+        self.center_gate_th = th['center_gate']      # 중앙유지 활성 d_side_max 임계 (7차 조정)
+        self.center_gate_ramp = th['center_gate_ramp']  # 중앙유지 선형 램프 폭 (7차 조정)
         self.collision_margin = th['collision_margin']  # 외곽 기준 충돌 여유 임계
 
         tg = cfg['target']
@@ -120,22 +124,28 @@ class RewardCalculator:
         r_safe_side = -self.beta_s * max(0.0, self.side_th - d_side) ** 2
         r_safety = r_safe_front + r_safe_side
 
-        # --- R_pose_center (§3.3): 통로 정렬 + 중앙 유지 ---
-        # |좌-우| 항은 상한 1.0m 클립 (5차 조정): 입구처럼 한쪽만 트인 곳에서
-        # 큰 비대칭이 과도한 벌점으로 번지는 것을 방지.
-        r_pose = (-self.gamma_ * abs(yaw_err)
-                  - self.zeta * min(abs(d_left - d_right), 1.0))
-
-        # --- 모드 전환 (§4, 5차 조정): 하드 스위치 → 선형 램프 ---
-        # 기존 on/off 는 통로 입구(1.5m 경계)에서 보상이 불연속으로 점프해
-        # "들어가는 순간 벌점" 구조였다 (1차 학습 입구 망설임의 원인 중 하나).
-        # d_side 가 aisle_mode_th 에서 (aisle_mode_th − aisle_ramp)까지 줄어드는
-        # 동안 0→1 로 서서히 켠다. 통로 내부(d_side≈0.4m)에서는 완전 활성.
+        # --- R_pose_center (§3.3, 7차 조정: yaw/중앙 게이트 분리) ---
+        # [7차 진단] 5차 램프는 d_side_min 이 입구에서 '서서히' 줄어든다고 가정했지만,
+        # 실제로는 잎벽이 측면 창(±90°±15°)에 들어오는 순간 ~2.1m → ~0.4m 로
+        # 불연속 점프한다 (입구 밖 측면 = 외벽/트인 공간). 그 전환 구간에서 한쪽
+        # 창만 잎벽을 보고 반대쪽은 아직 트여 있어 |좌-우| 가 1.0 캡까지 포화 →
+        # 입구에서 w3·ζ·1.0 의 구조적 진입 벌점("입구 관문")이 발생했다 (sac_2
+        # eval 에서 진입 순간 자세 탐색 거동으로 실측).
+        #
+        # yaw 정렬: 기존 d_side_min 램프 유지 (한쪽 벽만 보여도 정렬은 의미 있음)
         d_side_min = min(d_left, d_right)
+        d_side_max = max(d_left, d_right)
         in_aisle = d_side_min < self.aisle_mode_th       # (로깅/진단용 불리언)
-        ramp = min(max((self.aisle_mode_th - d_side_min) / self.aisle_ramp, 0.0),
-                   1.0)
-        w3_eff = self.w3 * ramp
+        yaw_ramp = min(max((self.aisle_mode_th - d_side_min) / self.aisle_ramp,
+                           0.0), 1.0)
+        # 중앙 유지: 양쪽 벽이 '모두' 가까울 때(=진짜 통로 내부)만 활성.
+        # 입구는 한쪽만 트여 d_side_max ≫ 1 → 게이트 0 (입구 |Δ좌우| 관문 제거)
+        center_ramp = min(max(
+            (self.center_gate_th - d_side_max) / self.center_gate_ramp, 0.0), 1.0)
+
+        r_yaw = -self.gamma_ * abs(yaw_err)
+        # |좌-우| 상한 1.0m 클립(5차)은 게이트가 꺼지기 전 잔여 구간 방어용으로 유지
+        r_center = -self.zeta * min(abs(d_left - d_right), 1.0)
 
         # --- R_smooth (5차 조정): 행동 변화 페널티 −k·‖a_t − a_{t−1}‖² ---
         # 잔떨림(스텝마다 행동 반전)에 비용을 부여해 매끄러운 주행 유도.
@@ -155,7 +165,9 @@ class RewardCalculator:
         r_gaze = -self.eta * abs(theta_t) if visible else 0.0
 
         reward = (self.w1 * r_track + r_approach
-                  + self.w2 * r_safety + w3_eff * r_pose + r_smooth + r_gaze)
+                  + self.w2 * r_safety
+                  + self.w3 * (yaw_ramp * r_yaw + center_ramp * r_center)
+                  + r_smooth + r_gaze)
 
         # ===== 2) 종료 조건 판정 (§5) — 우선순위: 충돌 > 이탈 > 정체 > 성공 =====
         terminal = None
@@ -193,7 +205,8 @@ class RewardCalculator:
             'r_track': r_track,
             'r_approach': r_approach,
             'r_safety': r_safety,
-            'r_pose': r_pose * ramp,    # 램프 반영 후 실효 기여분 (w3 가중 전)
+            # 램프 반영 후 실효 기여분 (w3 가중 전) — 7차: 항별 게이트 분리 반영
+            'r_pose': yaw_ramp * r_yaw + center_ramp * r_center,
             'r_smooth': r_smooth,
             'r_gaze': r_gaze,
             'in_aisle': in_aisle,
