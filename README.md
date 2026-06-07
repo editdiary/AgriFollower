@@ -16,7 +16,8 @@ ROSOrin(Hiwonder, 매카넘 휠) 로봇을 Ignition Gazebo 온실에 띄우고,
 **작업자(타겟)를 일정 거리로 추종하며 주변 장애물에 맞춰 최적 자세를 잡는 주행 정책**을 RL로 학습하는 것이 목표다.
 (단순 통로 주행/내비게이션이 아니라 **타겟 추종**이 핵심.)
 
-RL 설계는 [`docs/rl_design/0_project_proposal.md`](docs/rl_design/0_project_proposal.md)(개요·알고리즘·Sim-to-Real)와
+프로젝트 전반(설계 → 구현 → 학습 실험 이력 → 결과)은 [`docs/project_overview.md`](docs/project_overview.md)가 종합 출처다.
+RL 설계는 [`docs/rl_design/`](docs/rl_design/)의 계획서(`0_project_proposal.md` — 착수 시점 원형 보존)와
 상태/보상/시나리오 세부 노트(구체 수치·수식의 단일 출처)에 정리되어 있다.
 
 ## 핵심 정보
@@ -26,7 +27,7 @@ RL 설계는 [`docs/rl_design/0_project_proposal.md`](docs/rl_design/0_project_p
 | 로봇 | ROSOrin Mecanum (4 매카넘 휠, 3-DOF 홀로노믹) |
 | 센서 | 2D LiDAR(MS200) · RGB-D 카메라(aurora, `rgbd_camera` → `/depth_cam/*`) · IMU |
 | RL 과제 | 작업자 추종 (거리 유지 + 장애물 회피 + 매카넘 최적 자세) |
-| RL 스택(예정) | Gymnasium + Stable-Baselines3 (SAC 1순위 / PPO 베이스라인) |
+| RL 스택 | Gymnasium + Stable-Baselines3 (SAC 1순위 / PPO 베이스라인) |
 | 환경 | Docker(`nvidia-egl-desktop-ros2:humble`, noVNC) · Ubuntu 22.04 · ROS 2 Humble · Python 3.10 |
 
 ## 실행 환경
@@ -51,7 +52,7 @@ docker run -d \
   -v ~/rosorin_sim_ws:/home/user/rosorin_sim_ws \
   nvidia-egl-desktop-ros2:humble
 ```
-GPU/부하 상세는 [`docs/hardware_requirements.md`](docs/hardware_requirements.md), 최초 세팅 절차는 [`docs/setup_process.md`](docs/setup_process.md).
+GPU/부하 상세는 [`docs/environment.md`](docs/environment.md)("하드웨어 / 렌더링 부하" 절), 최초 세팅 절차는 [`docs/setup_process.md`](docs/setup_process.md).
 
 ## 설치 & 빌드 (컨테이너 안에서)
 ```bash
@@ -137,7 +138,7 @@ RL 스택(`rosorin_rl/launch/rl_sim.launch.py`)이 추가하는 인터페이스:
 ## 패키지 구조 (`src/`)
 ```
 rosorin_sim_ws/
-├── docs/                              # 상세 문서 (rl_design/·roadmap·environment 등 — 아래 링크)
+├── docs/                              # 상세 문서 (project_overview·rl_design/·environment 등 — 아래 링크)
 └── src/
     ├── simulations/                   # ⚠️ 제조사 monorepo — repo에 미포함. zip에서 복원 ("제조사 코드 & 에셋")
     │   ├── robot_gazebo/              #   Ignition world·로봇 spawn·브리지·ros2_control·teleop (시뮬 진입점)
@@ -164,16 +165,15 @@ rosorin_sim_ws/
 > 텍스처(`greenhouse_sim/media/.../*.jpg`)는 **우리 자체 에셋**이라 repo에 포함한다.
 
 ## 문서
+- [`docs/project_overview.md`](docs/project_overview.md) — **프로젝트 종합** (배경·설계·구현·학습 실험 이력·평가 결과 — 보고서 초안)
 - [`docs/runbook.md`](docs/runbook.md) — **런북: 상황별 실행 명령어 모음** (학습 시작/재개·모니터링·종료 후 확인·평가 — 복사해서 바로 실행)
-- [`docs/rl_design/`](docs/rl_design/) — **RL 설계 문서** 모음
-  - [`0_project_proposal.md`](docs/rl_design/0_project_proposal.md) — RL 설계 개요 (목적·파이프라인·MDP 개요, SAC·PPO, Sim-to-Real)
-  - [`rl_state_space.md`](docs/rl_design/rl_state_space.md) · [`rl_reward_function.md`](docs/rl_design/rl_reward_function.md) · [`rl_train_senarioes.md`](docs/rl_design/rl_train_senarioes.md) — 상태/보상/학습 시나리오 세부 노트 (**구체 수치·수식의 단일 출처**)
 - [`docs/rl_code_guide.md`](docs/rl_code_guide.md) — **RL 코드 가이드** (아키텍처 맵·검증 체크리스트·보상 튜닝 표·TensorBoard 모니터링·함정)
-- [`docs/roadmap.md`](docs/roadmap.md) — 진행 상황 & 단계별 실행 계획 (검증 → sim 보강 → `rosorin_rl` → 학습 → Sim-to-Real)
+- [`docs/rl_design/`](docs/rl_design/) — **RL 설계 문서** 모음
+  - [`0_project_proposal.md`](docs/rl_design/0_project_proposal.md) — 프로젝트 계획서 (착수 시점 원형 보존 — 실제 진행은 `project_overview.md`)
+  - [`rl_state_space.md`](docs/rl_design/rl_state_space.md) · [`rl_reward_function.md`](docs/rl_design/rl_reward_function.md) · [`rl_train_scenarios.md`](docs/rl_design/rl_train_scenarios.md) — 상태/보상/학습 시나리오 세부 노트 (**구체 수치·수식의 단일 출처**)
+- [`docs/environment.md`](docs/environment.md) — Ignition 스택 · `.typerc` · 토픽 · 센서 스펙 · 하드웨어/GPU 부하
 - [`docs/setup_process.md`](docs/setup_process.md) — Ignition 세팅 성공 기록 (설치 절차)
 - [`docs/troubleshooting.md`](docs/troubleshooting.md) — 치명적 오류 기록부 (원인·해결; 예: depth_cam 대각선 회색)
-- [`docs/environment.md`](docs/environment.md) — Ignition 스택 · `.typerc` · 토픽 · 센서 스펙
-- [`docs/hardware_requirements.md`](docs/hardware_requirements.md) — Docker/GPU 환경 · 학습 처리량
 
 ## 라이선스
 - 이 repo에 포함된 **우리 코드/문서/에셋은 [Apache License 2.0](LICENSE)** (`LICENSE`·`NOTICE` 참고).

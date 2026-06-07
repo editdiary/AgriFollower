@@ -33,12 +33,13 @@
 | ③ | `obs_pipeline.py` | `rl_state_space.md` §2.2~§3 | 16D 정제 + 3프레임 스택 = 48D |
 | ④ | `reward.py` | `rl_reward_function.md` §2~§5 | 보상 3항 + 모드 전환 + 종료 5종 |
 | ⑤ | `follow_env.py` | `0_project_proposal.md` §4.3 | Gym ⇄ ROS 브리지 (reset/step) |
-| ⑥ | `target_controller_node.py` | `rl_train_senarioes.md` §2 | 작업자 걸음 (전략 패턴 — 시나리오 확장점) |
-| ⑦ | `target_feature_node.py` | roadmap 2단계 (b) | Sim-to-Real 교체 지점 |
+| ⑥ | `target_controller_node.py` | `rl_train_scenarios.md` §2 | 작업자 걸음 (전략 패턴 — 시나리오 확장점) |
+| ⑦ | `target_feature_node.py` | `project_overview.md` §7 | Sim-to-Real 교체 지점 |
 | ⑧ | `train_sac.py` / `eval_policy.py` | proposal §6 | SB3 학습/평가 |
 
 **Sim-to-Real 때 바뀌는 것은 ⑦ 하나뿐이다** — `/target/features` 발행자를
-실물 비전(AprilTag 검출) 노드로 갈아끼우면 환경·정책 코드는 불변 (roadmap 5단계).
+실물 비전(AprilTag 검출) 노드로 갈아끼우면 환경·정책 코드는 불변 (실물 포팅은
+본 프로젝트 범위 외 — `project_overview.md` §7).
 
 ## 2. 검증 체크리스트 — 직접 눈으로 확인할 것
 
@@ -325,12 +326,14 @@ pandas 자유 분석: `pd.read_csv('rl_logs/monitor_sac_2.csv', skiprows=1)`
    `eval_policy`(deterministic=True) 로 평가할 것. → sac_1 평가에서 실제로 잔떨림이
    확인되어 5차 조정에서 액션 변화율 페널티 `k_smooth`(R_smooth) 를 도입했다.
 
-## 6. 다음 단계 (roadmap 연동)
+## 6. 다음 단계
 
-- **시나리오 2~5 추가:** `target_controller_node.py` 의 `GaitStrategy` 상속 + `STRATEGIES`
-  등록만으로 확장. 커리큘럼 비율은 `rl_train_senarioes.md` §3.
-- **본 학습:** `ros2 run rosorin_rl train_sac --timesteps 200000` (헤드리스 권장).
-  PPO 비교군: `--algo ppo`. 평가: `eval_policy` 3지표 (proposal §6.3).
-- **랜덤 시작 위치(도메인 랜덤화 확장):** 7차에서 로봇 횡위치 ±5cm
-  (`robot.reset_y_jitter`)는 도입됨. 종방향(x)·타겟 시작점 랜덤화는 미적용 —
-  `follow_env.reset()` 의 `options`/`config` 확장으로 일반화에 유리.
+남은 작업은 학습 런 (진행 이력·결과는 `project_overview.md` §5):
+
+- **본 학습 (sac_3 진행 중):** `ros2 run rosorin_rl train_sac --timesteps 200000` (헤드리스 권장).
+- **PPO 베이스라인 비교:** `--algo ppo` (코드 구현 완료, 런 미실시). 평가: `eval_policy`
+  3지표 (proposal §6.3) — 결과는 `project_overview.md` §6 비교표에 기입.
+
+확장점 (미수행 — 본 프로젝트 범위 외, `project_overview.md` §7): 시나리오 2~5
+(`GaitStrategy` 상속 + `STRATEGIES` 등록 — `rl_train_scenarios.md` §3), 종방향(x)·타겟
+시작점 랜덤화 (`follow_env.reset()` 의 `options`/`config` 확장).

@@ -1,5 +1,9 @@
 # 📄 [프로젝트 계획서] 강화학습 기반 수확 보조 운반 로봇의 자율 추종 시스템
 
+> **[현황 주석]** 본 문서는 **착수 시점의 계획서**로, 원형을 보존한다. 실제 진행 범위·구현·학습
+> 실험·결과는 [`../project_overview.md`](../project_overview.md)가 단일 출처다.
+> 특히 §1의 "Sim-to-Real 실물 포팅"은 본 수업 프로젝트 범위에서 제외되었다 (overview §7 향후 과제).
+
 ## 1. 프로젝트 목적 및 범위
 
 * **최종 목표**: 수확 작업자의 육체적 피로도(무거운 수확 바구니 운반 등)를 경감하고 작업 효율을 극대화하기 위한 "수확 작업 보조 자율 운반 로봇" 구현. 이를 위해 좁은 온실 환경에서 로봇이 작업자의 동선을 따라다니며 수확한 과일을 제자리에서 즉시 바구니에 편하게 담을 수 있도록 돕고, 바구니가 가득 찰 경우 지정된 집하 위치로 자동 이송 및 복귀하는 전체 시스템을 개발한다.
@@ -78,7 +82,7 @@
 
 * **`reset()` (초기화):**
 * 로봇이 벽에 박거나 학습이 끝나면, 시뮬레이터의 world 리셋 서비스를 호출하여 로봇과 타겟(원기둥)의 위치를 원점으로 되돌린다.
-* ⚠️ `/reset_world`는 **Gazebo Classic 문법** — 본 ws(Ignition Fortress)에서는 `/world/<name>/control`(WorldControl reset) 또는 `/world/<name>/set_pose`를 사용한다. 상세는 `docs/roadmap.md` 2단계 (d).
+* ⚠️ `/reset_world`는 **Gazebo Classic 문법** — 본 ws(Ignition Fortress)에서는 `/world/<name>/control`(WorldControl reset) 또는 `/world/<name>/set_pose`를 사용한다. 실제 채택한 리셋 경로(set_pose 텔레포트)는 `../project_overview.md` §4.1.
 
 ### 4.4. Sim-to-Real (현실 이식) 고려사항
 
@@ -92,7 +96,7 @@
 ## 5. MDP (마르코프 결정 과정) 정의
 
 > 🔗 이 장은 **개요만** 유지한다. 구체 수치·수식·전처리의 **단일 출처는 세부 노트**:
-> 상태 공간 → [`rl_state_space.md`](rl_state_space.md) · 보상/종료 → [`rl_reward_function.md`](rl_reward_function.md) · 학습 시나리오 → [`rl_train_senarioes.md`](rl_train_senarioes.md)
+> 상태 공간 → [`rl_state_space.md`](rl_state_space.md) · 보상/종료 → [`rl_reward_function.md`](rl_reward_function.md) · 학습 시나리오 → [`rl_train_scenarios.md`](rl_train_scenarios.md)
 
 ### 5.1. 상태 공간 (State Space, $S_t$)
 
@@ -130,7 +134,7 @@ $$R_t = w_1 \cdot R_{tracking} + w_2 \cdot R_{safety} + w_3 \cdot R_{pose\_cente
 
 ### 5.4. 에피소드 종료 조건 (Terminal Conditions)
 
-아래 조건 중 하나라도 만족하면 에피소드를 즉시 종료(Done)하고 환경을 초기화(`reset`)한다. — 임계값·점수의 단일 출처는 `rl_reward_function.md` §5 · `rl_train_senarioes.md` §4
+아래 조건 중 하나라도 만족하면 에피소드를 즉시 종료(Done)하고 환경을 초기화(`reset`)한다. — 임계값·점수의 단일 출처는 `rl_reward_function.md` §5
 
 1. **목표 달성 (Success, +100):** 최대 제한 스텝 동안 실패 조건 없이 추종 생존.
 2. **환경 충돌 (-100):** 작물 벽·구조물과의 물리적 충돌.

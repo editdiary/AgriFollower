@@ -1,14 +1,14 @@
 """target_feature_node.py — 타겟(작업자) 특징 토픽 발행 노드.
 
 설계 출처: docs/rl_design/rl_state_space.md §2.1 (RGB-D 타겟 특징 4차원)
-roadmap 2단계 (b): "ground-truth pose 에서 타겟 특징 산출 + 가우시안 노이즈 주입"
+구현 경위: docs/project_overview.md §4.1 (타겟 특징 토픽 — GT 역산 + 가우시안 노이즈 주입)
 
 [ Sim-to-Real 핵심 설계 ]
 실물 로봇에서는 RGB-D 영상에서 마커(AprilTag)를 검출하는 비전 노드가
 이 토픽(/target/features)을 발행하게 된다. 시뮬에서는 무거운 비전 연산 대신
 ground-truth pose 로 같은 값을 역산해 발행한다.
 → RL 환경(follow_env.py)은 이 토픽만 구독하므로,
-  나중에 발행자만 비전 노드로 교체하면 학습 코드는 한 줄도 안 바뀐다 (roadmap 5단계).
+  나중에 발행자만 비전 노드로 교체하면 학습 코드는 한 줄도 안 바뀐다 (project_overview.md §7).
 
 발행 메시지 (std_msgs/Float32MultiArray, /target/features, 15Hz):
   data = [x_norm, y_norm, d_t, theta_t, visible]

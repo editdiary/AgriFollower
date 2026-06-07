@@ -110,7 +110,7 @@ def world_to_target_features(robot_x, robot_y, robot_yaw,
     """월드 좌표(ground truth) → 카메라 기준 타겟 특징 [x_norm, y_norm, d_t, θ_t].
 
     실물에서는 RGB-D 영상에서 마커(AprilTag)를 검출해 이 4개 값을 얻지만(rl_state_space.md §2.1),
-    시뮬에서는 객체검출 대신 ground-truth pose 로 같은 값을 역산한다(roadmap 2단계 (b)).
+    시뮬에서는 객체검출 대신 ground-truth pose 로 같은 값을 역산한다(docs/project_overview.md §4.1).
     출력 인터페이스를 동일하게 유지해야 Sim-to-Real 때 비전 노드로 갈아끼울 수 있다.
 
     Args:

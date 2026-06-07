@@ -1,7 +1,8 @@
 # CLAUDE.md — rosorin_sim_ws (AgriFollower)
 
 ROSOrin(매카넘) **Ignition Gazebo 시뮬 + 강화학습** 워크스페이스. 목표는 온실에서 **작업자(타겟) 추종** 주행 정책 학습.
-프로젝트 개요·환경·실행법은 `README.md`, RL 설계는 `docs/rl_design/`(개요 `0_project_proposal.md`, 수치·수식은 세부 노트)가 단일 출처다.
+프로젝트 전반(설계→구현→학습 이력→결과)은 `docs/project_overview.md`, 환경·실행법은 `README.md`,
+RL 설계 수치·수식은 `docs/rl_design/` 세부 노트가 단일 출처다.
 (이 파일은 가볍게 유지 — 상세 절차/배경은 아래 "어디에 뭐가 있나"의 위치를 그때그때 참조할 것.)
 
 ## 개발 환경 & 버전 (코드/명령 생성 전 기준값)
@@ -24,12 +25,11 @@ ROSOrin(매카넘) **Ignition Gazebo 시뮬 + 강화학습** 워크스페이스.
 - 라이선스: 우리 코드는 Apache-2.0(`LICENSE`/`NOTICE`). 제조사 코드는 제외 — 상세는 `README.md` "제조사 코드 & 에셋"·"라이선스".
 
 ## 어디에 뭐가 있나 (필요할 때 참조)
+- **프로젝트 종합 (배경·설계·구현·학습 실험 이력 §5·평가·향후 과제 §7 — 보고서 초안)** → `docs/project_overview.md`
 - **상황별 실행 명령어 (학습 시작/재개·모니터링·종료 후 확인·평가 런북)** → `docs/runbook.md`
 - 프로젝트 개요·실행 환경·빌드/실행·온실 재생성·토픽표 → `README.md`
-- RL 설계 (MDP·보상·SAC/PPO·Sim-to-Real) → `docs/rl_design/` (개요 `0_project_proposal.md` · 구체 수치/수식의 단일 출처는 상태/보상/시나리오 세부 노트)
+- RL 설계 수치·수식 (MDP·보상·시나리오) → `docs/rl_design/` 세부 노트 (단일 출처 · `0_project_proposal.md`는 착수 시점 계획서 원형)
 - RL 코드 (아키텍처·검증 체크리스트·튜닝 표·**시뮬 보정 사항**: 매카넘 y반전·뎁스범퍼 바닥차감·set_pose 타겟) → `docs/rl_code_guide.md`
-- 진행 상황·단계별 실행 계획 → `docs/roadmap.md`
-- Ignition 스택·`.typerc`·토픽 인터페이스·센서 스펙 → `docs/environment.md`
-- Docker/GPU 환경·학습 처리량 → `docs/hardware_requirements.md`
+- Ignition 스택·`.typerc`·토픽 인터페이스·센서 스펙·하드웨어/GPU 부하 → `docs/environment.md`
 - 세팅 성공 기록(설치 절차) → `docs/setup_process.md`
 - 치명적 오류 기록(원인·해결) → `docs/troubleshooting.md`

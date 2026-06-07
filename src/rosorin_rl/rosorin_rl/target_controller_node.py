@@ -1,7 +1,7 @@
 """target_controller_node.py — 작업자(타겟) 원기둥을 움직이는 컨트롤러 노드.
 
-설계 출처: docs/rl_design/rl_train_senarioes.md §2 (학습 시나리오)
-roadmap 2단계 (a): "이동 원기둥 + 컨트롤러 노드(직진/지그재그·무작위 속도)"
+설계 출처: docs/rl_design/rl_train_scenarios.md §2 (학습 시나리오)
+구현 경위: docs/project_overview.md §4.1 (이동 타겟 — set_pose 키네마틱 구동)
 
 [ 구동 방식: set_pose 키네마틱 ]
 - 노드가 작업자의 pose 를 자체 적분(x += v·dt)으로 관리하고, 20Hz 로
@@ -50,7 +50,7 @@ class GaitStrategy:
 
 
 class ConstantWalk(GaitStrategy):
-    """시나리오 1 — 정속 주행 (rl_train_senarioes.md §2 시나리오 1).
+    """시나리오 1 — 정속 주행 (rl_train_scenarios.md §2).
 
     통로(+x 방향)를 일정 속도로 걷다가, 통로 끝(x_max)에 도달하면
     반대 방향으로 돌아 걸어온다(왕복).

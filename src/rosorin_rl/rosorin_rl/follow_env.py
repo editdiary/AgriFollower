@@ -1,7 +1,7 @@
 """follow_env.py — 작업자 추종 커스텀 Gymnasium 환경 (ROS 2 ⇄ Ignition 브리지).
 
 설계 출처: docs/rl_design/0_project_proposal.md §4.3 (The Bridge), §5 (MDP)
-           docs/roadmap.md 3단계
+           docs/project_overview.md §4.2 (구현)
 
 [ 구조 개요 ]
   "Gazebo 시뮬레이터"와 "Stable-Baselines3(파이썬)"는 서로 다른 프로그램이다.
@@ -258,7 +258,7 @@ class FollowTargetEnv(gym.Env):
             self.node.get_logger().warn('/worker/reset 서비스 없음 — '
                                         'target_controller 가 떠 있는지 확인.')
 
-        # ③ 로봇 텔레포트 (Ignition Fortress set_pose — roadmap 2단계 (d))
+        # ③ 로봇 텔레포트 (Ignition Fortress set_pose — project_overview.md §4.1)
         #    [7차] reset_y 에 ±jitter 무작위 횡오프셋: 고정 스폰이 만든 편향 궤적
         #    고착을 깨고 능동 중앙 보정을 학습하도록 강제 (도메인 랜덤화).
         #    self.np_random 은 super().reset(seed=...) 가 시드 — 재현 가능.
