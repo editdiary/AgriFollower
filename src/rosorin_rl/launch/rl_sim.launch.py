@@ -36,7 +36,7 @@ def generate_launch_description():
     greenhouse_share = get_package_share_directory('greenhouse_sim')
 
     headless = LaunchConfiguration('headless', default='false')
-    scenario = LaunchConfiguration('scenario', default='1')
+    scenario = LaunchConfiguration('scenario', default='2')
 
     # ---------------- ① 기존 온실 스택 (world + 로봇 + 센서 브리지) ----------------
     greenhouse_launch = IncludeLaunchDescription(
@@ -87,11 +87,15 @@ def generate_launch_description():
             # LaunchConfiguration 은 문자열이므로 int 로 명시 변환
             'scenario': ParameterValue(scenario, value_type=int),
             # 보행 속도·왕복 구간·시작 위치는 config/rl_params.yaml 의 target 섹션과 일치시킬 것
-            'speed': 0.1,         # 커리큘럼 1단계 (7차, config 주석 참조)
+            'speed': 0.2,         # StopGo walk 구간 속도 (config 주석 참조)
             'aisle_x_min': 0.9,
             'aisle_x_max': 6.3,
             'reset_x': 0.6,       # 통로 입구
             'reset_y': 0.0,
+            # StopGo(시나리오 2) 파라미터 — 작물 단위 stop-and-go
+            'step_distance': 0.5,  # 한 번 이동 거리 = 작물 간격(PLANT_SPACING_X)
+            'stop_time_min': 3.0,  # 작업(멈춤) 시간 랜덤 하한 [s]
+            'stop_time_max': 6.0,  # 작업(멈춤) 시간 랜덤 상한 [s]
         }],
     )
 
@@ -110,8 +114,8 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('headless', default_value='false',
                               description='true 면 GUI 없이 서버만 (학습용)'),
-        DeclareLaunchArgument('scenario', default_value='1',
-                              description='학습 시나리오 번호 (현재 1만 구현)'),
+        DeclareLaunchArgument('scenario', default_value='2',
+                              description='학습 시나리오 (1=정속왕복, 2=StopGo 작물단위 정지·이동)'),
         greenhouse_launch,
         spawn_worker,
         rl_bridge,

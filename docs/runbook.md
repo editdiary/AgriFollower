@@ -41,7 +41,7 @@ ros2 launch rosorin_rl rl_sim.launch.py headless:=true
 | launch 인자 | 기본값 | 설명 |
 |---|---|---|
 | `headless` | `false` | `true`면 GUI 없이 서버만 (센서 렌더링은 EGL로 유지됨). 학습용 |
-| `scenario` | `1` | 학습 시나리오 번호 (현재 1만 구현: 작업자 정속 왕복) |
+| `scenario` | `2` | 학습 시나리오 (1=정속 왕복, 2=StopGo 작물 단위 정지·이동). 기본 2 |
 
 **터미널 2 — 학습 시작** (시뮬이 뜬 뒤에):
 
@@ -167,7 +167,7 @@ tail -30 ~/rosorin_sim_ws/rl_logs/monitor_sac_2.csv
 1. **잘 됐나?** — `rollout/ep_rew_mean` · `ep_len_mean` · `episode/success_rate` 우상향 여부
 2. **왜 죽었나?** — `episode/*_rate` (lost / env_collision / target_collision / stuck 비율)
 3. **어느 보상 항이 끌고/막았나?** — `reward/r_*_mean` 분해
-4. **어떻게 행동했나?** — `action/abs_*_mean` · `state/d_t_mean`(0.65 수렴이 이상적) · `in_aisle_ratio`
+4. **어떻게 행동했나?** — `action/abs_*_mean` · `state/d_t_mean`(0.87 수렴이 이상적) · `in_aisle_ratio`
 5. **최적화는 건강했나?** — `train/ent_coef` · `critic_loss` (actor_loss는 음수로 깊어지는 게 정상)
 
 > ⚠️ `episode/*_rate` 는 최근 100 에피소드 롤링 윈도라 급변 직후엔 과거가 섞여 보인다.
@@ -260,7 +260,7 @@ ros2 run rosorin_rl eval_policy \
 | 리턴 / 길이 | 에피소드 누적 보상 / 생존 스텝 (1500 스텝 생존 = success) |
 | 종료 | `success` / `lost`(타겟 놓침) / `env_collision` / `target_collision` / `stuck` |
 | ω 부드러움 | 각속도 명령 변화량의 std — **낮을수록 부드러운 주행** (proposal §6.3-②) |
-| 밴드 점유율 | \|d_t − 0.65m\| < 0.15m 인 스텝 비율 — **높을수록 거리 유지 잘함** |
+| 밴드 점유율 | \|d_t − 0.87m\| < 0.15m 인 스텝 비율 — **높을수록 거리 유지 잘함** |
 | d_t 표준편차 | 타겟 거리 변동 — 낮을수록 일정한 간격 유지 |
 
 **자주 쓰는 변형:**

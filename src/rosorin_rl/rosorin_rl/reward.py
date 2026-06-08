@@ -7,7 +7,7 @@
     R_t = w1·R_tracking + R_approach + w2·R_safety + w3_eff·R_pose_center
           + R_smooth + R_gaze
 
-  - R_tracking   : 목표 거리(0.65m) 유지 — 가우시안 형태 연속 보상 (§3.1)
+  - R_tracking   : 목표 거리(0.87m) 유지 — 가우시안 형태 연속 보상 (§3.1)
   - R_approach   : 접근 shaping k·(d_prev−d_t) — 원거리에서도 추적 기울기 제공
                    (2차 조정에서 추가 — 학습 정체 진단 후. compute() 내 주석 참조)
   - R_safety     : 전방/측면 임계치 이원화, 클리핑된 2차 페널티 (§3.2)
@@ -54,7 +54,7 @@ class RewardCalculator:
         self.collision_margin = th['collision_margin']  # 외곽 기준 충돌 여유 임계
 
         tg = cfg['target']
-        self.d_opt = tg['opt_distance']            # 최적 추종 거리 0.65m
+        self.d_opt = tg['opt_distance']            # 최적 추종 거리 0.87m
         self.d_tgt_collision = tg['collision_distance']  # 타겟 충돌 0.4m
         self.d_lost = tg['lost_distance']          # 타겟 이탈 3.0m
 
@@ -100,8 +100,8 @@ class RewardCalculator:
         """
         # ===== 1) 하위 보상 계산 =====
 
-        # --- R_tracking (§3.1): 목표 거리 0.65m 와의 오차에 대한 가우시안 ---
-        # d=0.65 일 때 1.0(최대), 멀어질수록 0 으로 부드럽게 감소.
+        # --- R_tracking (§3.1): 목표 거리 0.87m 와의 오차에 대한 가우시안 ---
+        # d=0.87 일 때 1.0(최대), 멀어질수록 0 으로 부드럽게 감소.
         r_track = math.exp(-self.alpha * (d_t - self.d_opt) ** 2)
 
         # --- 접근 shaping (2차 조정에서 추가): k·(d_prev − d_t) ---

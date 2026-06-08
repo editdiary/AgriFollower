@@ -3,7 +3,8 @@
   worker_target.sdf — 작업자(타겟)를 대신하는 이동 원기둥 모델.
 
   proposal §4.2 의 "움직이는 원기둥으로 사람을 대체" 설계를 구현한다.
-  - 반지름 0.12m, 높이 1.6m: 서 있는 사람의 몸통 폭/키를 근사.
+  - 반지름 0.22m, 높이 1.6m: 서 있는 성인의 어깨폭(~0.44m, biacromial+의복)과 키를 근사.
+    (초기 0.12m는 실제 사람의 절반 수준이라 추종/충돌 거리가 비현실적으로 가까웠음 → 확대.)
     LiDAR 스캔 평면(z≈0.23m)과 카메라 시야에 모두 잡히는 높이.
 
   [ 구동 방식: set_pose 키네마틱 (static 모델) ]
@@ -27,14 +28,14 @@
       <!-- LiDAR 에 잡히는 충돌체 -->
       <collision name="body_collision">
         <geometry>
-          <cylinder><radius>0.12</radius><length>1.6</length></cylinder>
+          <cylinder><radius>0.22</radius><length>1.6</length></cylinder>
         </geometry>
       </collision>
 
       <!-- 눈으로 확인하기 위한 시각 모델 (주황색 = 작업조끼 느낌) -->
       <visual name="body_visual">
         <geometry>
-          <cylinder><radius>0.12</radius><length>1.6</length></cylinder>
+          <cylinder><radius>0.22</radius><length>1.6</length></cylinder>
         </geometry>
         <material>
           <ambient>0.9 0.45 0.1 1</ambient>
@@ -53,8 +54,8 @@
            텍스처: 같은 디렉터리의 tag36_11_00000.png (SDF 기준 상대경로),
            greenhouse_sim 잎 패널과 동일한 인라인 PBR albedo_map 기법. -->
       <visual name="apriltag_front">
-        <!-- 원기둥 표면(r=0.12) 바로 바깥 +x 면 -->
-        <pose>0.1235 0 -0.60 0 0 0</pose>
+        <!-- 원기둥 표면(r=0.22) 바로 바깥 +x 면 -->
+        <pose>0.2235 0 -0.60 0 0 0</pose>
         <geometry>
           <box><size>0.005 0.16 0.16</size></box>
         </geometry>
@@ -68,7 +69,7 @@
       </visual>
       <visual name="apriltag_back">
         <!-- -x 면 (로봇이 뒤따라올 때 보는 쪽) -->
-        <pose>-0.1235 0 -0.60 0 0 0</pose>
+        <pose>-0.2235 0 -0.60 0 0 0</pose>
         <geometry>
           <box><size>0.005 0.16 0.16</size></box>
         </geometry>

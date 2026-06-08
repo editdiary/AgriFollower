@@ -107,3 +107,4 @@ Ignition은 `IGN_GAZEBO_RESOURCE_PATH`(Fortress) / `GZ_SIM_RESOURCE_PATH`로 상
 - depth/RGB 카메라 시뮬이 가장 무겁다. 학습 시에는 **헤드리스(`headless:=true`)** 와 해상도/주기 튜닝 권장.
 - 단, **카메라 센서는 헤드리스에서도 GPU 렌더가 필요**하다(Ignition `Sensors` 시스템이 ogre2로 이미지 생성). 현행 상태공간(`rl_design/rl_state_space.md`)은 뎁스 범퍼·마커 특징에 카메라가 필수라 비활성은 불가.
 - Gazebo는 물리·렌더가 무거워 학습 속도가 real-time 대비 대략 ~2–5x 한계. 가벼운 PyBullet 류 대비 느리지만, 실 센서와 동일한 토픽 구조가 장점이라 채택 (`rl_design/0_project_proposal.md` §4.1).
+- 위 ~2–5x 를 내려면 world physics 의 `<real_time_factor>` 를 **`0`(무제한)** 으로 둬야 한다(`greenhouse.sdf`·생성기 `gen_greenhouse_world.py`). 기본값 `1.0` 이면 자원이 남아도 실시간(1x)에 묶인다. Fortress 는 `real_time_factor` 만 유효하고 Classic 의 `real_time_update_rate` 는 무시 — 함정·근거는 `troubleshooting.md`.

@@ -33,7 +33,7 @@
 | ③ | `obs_pipeline.py` | `rl_state_space.md` §2.2~§3 | 16D 정제 + 3프레임 스택 = 48D |
 | ④ | `reward.py` | `rl_reward_function.md` §2~§5 | 보상 3항 + 모드 전환 + 종료 5종 |
 | ⑤ | `follow_env.py` | `0_project_proposal.md` §4.3 | Gym ⇄ ROS 브리지 (reset/step) |
-| ⑥ | `target_controller_node.py` | `rl_train_scenarios.md` §2 | 작업자 걸음 (전략 패턴 — 시나리오 확장점) |
+| ⑥ | `target_controller_node.py` | `rl_train_scenarios.md` §2 | 작업자 걸음 (전략 패턴 — 시나리오 1 정속·2 StopGo) |
 | ⑦ | `target_feature_node.py` | `project_overview.md` §7 | Sim-to-Real 교체 지점 |
 | ⑧ | `train_sac.py` / `eval_policy.py` | proposal §6 | SB3 학습/평가 |
 
@@ -144,11 +144,11 @@ env.close()
 | `w1` | 2.0 | 추종 보상 비중 | 로봇이 추종을 포기하고 안전 거리만 유지 → w1↑ |
 | `w2` | 0.5 | 안전 페널티 비중 | 벽을 자주 긁음 → w2↑ / 벽이 무서워 위축(통로 진입 회피) → w2↓ |
 | `w3` | 0.5 | 자세·중앙 유지 비중 | 통로에서 비스듬히 주행 → w3↑ / 코너에서 굳음 → w3↓ |
-| `alpha` | 5.0 | 추종 가우시안 폭(클수록 뾰족) | 0.65m 근처에서 출렁임 → α↓ / 멀리서 배회(원거리에서도 보상 후함) → α↑ |
+| `alpha` | 5.0 | 추종 가우시안 폭(클수록 뾰족) | 0.87m 근처에서 출렁임 → α↓ / 멀리서 배회(원거리에서도 보상 후함) → α↑ |
 | `k_approach` | 5.0 | **접근 shaping** `k·(d_prev−d_t)` — 거리 불문 "가까워지면 +" 즉각 신호. d<d_opt(과근접)에선 0 처리 | 멀리서 타겟을 아예 못 찾아감 → ↑ / 과속 돌진 → ↓ |
 | `k_smooth` | 0.05 | **행동 변화 페널티** `−k·‖a_t−a_{t−1}‖²` (5차 신규) — 잔떨림에 비용 부여 | 평가에서 잔떨림 여전 → ↑ / 반응이 둔해져 회피가 늦음 → ↓ |
 | `eta` | 0.3 | **타겟 주시 페널티** `−η·\|θ_t\|` (6차 신규, visible 시) — 화면 중앙 유지 유도, lost 절벽의 dense 선행 신호 | 고개 휙 돌림 여전 → ↑ / 주시 강박으로 회피 회전을 못 함 → ↓ |
-| `beta_f` | 30.0 | 전방 페널티 강도 | 전방 추돌 잦음 → ↑ / 타겟 근접(0.65m)을 페널티로 회피 → ↓ |
+| `beta_f` | 30.0 | 전방 페널티 강도 | 전방 추돌 잦음 → ↑ / 타겟 근접(0.87m)을 페널티로 회피 → ↓ |
 | `beta_s` | 80.0 | 측면 페널티 강도 | 측면 긁힘 잦음 → ↑ |
 | `gamma` | 0.5 | 헤딩 정렬 페널티 | U턴 학습(시나리오5) 때 회전을 못 함 → ↓ |
 | `zeta` | 1.0 | 중앙 유지 페널티 (7차: 0.5→1.0, 우편향 진단 — `center_gate` 분리로 입구 부작용 없이 강화 가능) | 한쪽 벽에 붙어 다님 → ↑ (1.5 후보) / 중앙 강박으로 추종이 굳음 → ↓ |
@@ -215,7 +215,7 @@ tensorboard --logdir ~/rosorin_sim_ws/rl_logs   # http://localhost:6006
 | `episode/success_rate` 등 5종 | 최근 100 에피소드의 종료 사유 비율 | **"왜 죽는가"의 답.** lost_rate↑ = 추적 신호 부족 / env_collision_rate↑ = 안전 항 점검 / success_rate 우상향 = 승기 |
 | `reward/r_track_mean` `r_approach_mean` `r_safety_mean` `r_pose_mean` | 에피소드 평균 보상 컴포넌트 | 어느 항이 끌고/막는지 분해. 한 항만 비대 = 꼼수 의심 |
 | `action/abs_ax(ay,aw)_mean` | 평균 행동 사용량 | `abs_ay`(게걸음) 상승 시점 = 매카넘 활용 시작 (proposal §6.3-②) |
-| `state/d_t_mean` | 평균 타겟 거리 | 0.65 로 수렴하면 이상적 |
+| `state/d_t_mean` | 평균 타겟 거리 | 0.87 로 수렴하면 이상적 |
 | `state/in_aisle_ratio` | 통로 내부 비율 | 0 에 머물면 "통로 진입 회피" 학습 의심 → w2↓ 또는 env_collision 완화 |
 
 > ⚠️ **윈도 지연 주의:** `episode/*_rate` 는 최근 **100 에피소드 롤링 윈도**라 급변 직후엔
@@ -267,9 +267,13 @@ pandas 자유 분석: `pd.read_csv('rl_logs/monitor_sac_2.csv', skiprows=1)`
    gravity off 가 무시돼 원기둥이 넘어지는 문제로 폐기. 현재는 static 모델을
    20Hz set_pose 로 움직인다(틱당 1.25cm — LiDAR 에 연속으로 보임). 작업자의 위치
    단일 출처는 **컨트롤러의 내부 적분값**(`/worker/pose`)이다.
-4. **sim time 기준 동작:** env 의 step 대기·노드 타이머 모두 sim time. RTF(실시간 배율)가
-   0.5 면 학습 wall-clock 도 2배 — 거동은 동일하다. 처리량이 필요하면
-   `ros2 launch rosorin_rl rl_sim.launch.py headless:=true` (GUI 없이 센서 렌더 유지).
+4. **sim time 기준 동작:** env 의 step 대기(`_sleep_sim`)·노드 타이머 모두 sim time 기준이라,
+   RTF(실시간 배율)가 얼마든 한 step 은 늘 sim 0.1초어치 거동을 관측한다 — 거동·학습 데이터 불변.
+   처리량 확보를 위해 world(`greenhouse.sdf`) physics 는 `real_time_factor=0`(무제한)으로 둬 실시간
+   throttle 을 풀었다. 관측 RTF 는 1~5x 를 오가며(센서 렌더 버스트·GPU 경합으로 출렁이는 게 정상),
+   순간값이 아니라 평균 fps 로 본다. headless(`rl_sim.launch.py headless:=true`)면 GUI 비용까지 제거.
+   ⚠️ Fortress 의 throttle 노브는 `real_time_factor` 뿐 — Classic 의 `real_time_update_rate` 는
+   무시된다 (상세·근거: `troubleshooting.md`).
 5. **재빌드가 필요한 경우:** `--symlink-install` 이라 **파이썬 코드·yaml 수정은 재빌드
    불필요.** `setup.py`(엔트리포인트)·launch 파일 추가·새 파일 생성 시에만
    `colcon build --symlink-install --packages-select rosorin_rl`.
@@ -315,11 +319,11 @@ pandas 자유 분석: `pd.read_csv('rl_logs/monitor_sac_2.csv', skiprows=1)`
    전방 + 화각 ±30°"만 검사해서 **작물 벽 너머의 타겟도 visible=1 로 발행되는
    "벽 투시" 버그**가 있었다(사용자가 GUI에서 "다른 통로에서도 타겟 위치를 아는 듯한
    행동"으로 발견). 실물 AprilTag 검출에선 불가능한 정보라 Sim-to-Real 갭이기도 했다.
-   현재는 `geometry_utils.OCCLUDERS`(작물 줄 3개의 2D AABB — `gen_greenhouse_world.py`
+   현재는 `geometry_utils.OCCLUDERS`(작물 줄 4개의 2D AABB — `gen_greenhouse_world.py`
    레이아웃에서 도출)와 카메라→타겟 선분의 교차로 차폐를 판정한다(잎 높이 1.4m >
    마커 0.20m 라 2D 로 충분). **온실 레이아웃을 바꾸면 OCCLUDERS 도 함께 갱신할 것.**
    미검출 프레임 처리는 last-known 유지 + env 의 "연속 15스텝 → lost" — d_t 를 0 으로
-   리셋하면 사람 충돌(d_t<0.4) 종료가 오발하므로 0 리셋 방식은 쓰지 않는다(설계 결정).
+   리셋하면 사람 충돌(d_t<0.62) 종료가 오발하므로 0 리셋 방식은 쓰지 않는다(설계 결정).
    검증: 다른 통로 텔레포트 → visible=0 → step 21 lost 발화 / 정상 추종 50스텝 오발 0.
 13. **학습 중 자잘한 떨림은 SAC 탐색 샘플링이 주원인:** 학습 중에는 정책이 확률적으로
    행동을 샘플링하므로(엔트로피 탐색) 미세 진동이 정상이다. 정책의 실제 매끄러움은
@@ -334,6 +338,7 @@ pandas 자유 분석: `pd.read_csv('rl_logs/monitor_sac_2.csv', skiprows=1)`
 - **PPO 베이스라인 비교:** `--algo ppo` (코드 구현 완료, 런 미실시). 평가: `eval_policy`
   3지표 (proposal §6.3) — 결과는 `project_overview.md` §6 비교표에 기입.
 
-확장점 (미수행 — 본 프로젝트 범위 외, `project_overview.md` §7): 시나리오 2~5
+구현된 시나리오: 1(`ConstantWalk` 정속 왕복)·2(`StopGo` 작물 단위 stop-and-go).
+확장점 (미수행 — `project_overview.md` §7): 시나리오 3~5
 (`GaitStrategy` 상속 + `STRATEGIES` 등록 — `rl_train_scenarios.md` §3), 종방향(x)·타겟
 시작점 랜덤화 (`follow_env.reset()` 의 `options`/`config` 확장).

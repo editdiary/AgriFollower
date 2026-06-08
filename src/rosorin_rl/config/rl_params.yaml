@@ -42,14 +42,22 @@ episode:
 # 타겟(작업자) 관련
 # ---------------------------------------------------------------------------
 target:
-  opt_distance: 0.65        # [m] 최적 추종 거리 d_opt (rl_reward_function.md §3.1)
-  collision_distance: 0.4   # [m] 이보다 가까우면 '타겟 충돌' 종료 (-100)
+  opt_distance: 0.87        # [m] 최적 추종 거리 d_opt (rl_reward_function.md §3.1).
+                            #   기준: 로봇 앞범퍼↔사람 신체외곽 = 0.50m (팔 뻗어 적재함에
+                            #   담기 좋은 거리). d_t=gap+r+0.146 (r=원기둥 반지름 0.22,
+                            #   0.146=base→앞범퍼 0.251−CAM_MOUNT.x 0.105) → 0.50+0.22+0.146
+  collision_distance: 0.62  # [m] 이보다 가까우면 '타겟 충돌' 종료 (-100).
+                            #   기준: 앞범퍼↔신체외곽 = 0.25m → 0.25+0.22+0.146 (위 환산식)
   lost_distance: 3.0        # [m] 이보다 멀어지면 '타겟 이탈' 종료 (-50)
-  speed: 0.1                # [m/s] 작업자 보행 속도 — 커리큘럼 1단계 (7차: 0.05→0.1)
-                            #   sac_2(0.05) 수렴 확인 후 인상. 최종 목표 0.25 (시나리오 1
-                            #   명목치). ⚠️ launch/rl_sim.launch.py 의 speed 리터럴과
-                            #   반드시 함께 변경할 것 (이중 소스 — 노드는 yaml 미참조)
-  scenario: 1               # 학습 시나리오 번호 (현재 1=정속 주행만 구현)
+  speed: 0.2                # [m/s] 작업자 보행 속도 — StopGo(시나리오2) walk 구간 속도.
+                            #   (이력: 시나리오1 정속 커리큘럼 0.05→0.1 로 학습했었음.)
+                            #   ⚠️ launch/rl_sim.launch.py 의 speed 리터럴과 반드시 함께
+                            #   변경할 것 (이중 소스 — 노드는 yaml 미참조)
+  scenario: 2               # 학습 시나리오 (1=ConstantWalk 정속왕복, 2=StopGo 작물단위 stop-and-go)
+  # --- StopGo(시나리오 2) 파라미터 ---
+  step_distance: 0.5        # [m] 한 번에 이동하는 거리 = 작물 간격(PLANT_SPACING_X)
+  stop_time_min: 3.0        # [s] 작업(멈춤) 시간 하한 — 매 정차마다 [min,max]서 랜덤 샘플
+  stop_time_max: 6.0        # [s] 작업(멈춤) 시간 상한
   # 리셋 시 타겟 시작 위치 — 통로 입구(잎 시작점 x=0.60), 통로 중심선 y=0
   reset_x: 0.6              # [m]
   reset_y: 0.0              # [m]

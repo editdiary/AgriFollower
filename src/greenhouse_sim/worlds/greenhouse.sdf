@@ -4,7 +4,7 @@
 
     <physics name="default_physics" type="ignored">
       <max_step_size>0.001</max_step_size>
-      <real_time_factor>1.0</real_time_factor>
+      <real_time_factor>0</real_time_factor>
     </physics>
     <plugin filename="ignition-gazebo-physics-system"
             name="ignition::gazebo::systems::Physics"></plugin>
@@ -89,6 +89,12 @@
           <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
           <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
         </visual>
+        <visual name="soil_tile_0_6">
+          <cast_shadows>false</cast_shadows>
+          <pose>-0.410 3.000 0.003 0 0 0</pose>
+          <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
         <visual name="soil_tile_1_0">
           <cast_shadows>false</cast_shadows>
           <pose>0.590 -3.000 0.003 0 0 0</pose>
@@ -122,6 +128,12 @@
         <visual name="soil_tile_1_5">
           <cast_shadows>false</cast_shadows>
           <pose>0.590 2.000 0.003 0 0 0</pose>
+          <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="soil_tile_1_6">
+          <cast_shadows>false</cast_shadows>
+          <pose>0.590 3.000 0.003 0 0 0</pose>
           <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
           <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
         </visual>
@@ -161,6 +173,12 @@
           <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
           <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
         </visual>
+        <visual name="soil_tile_2_6">
+          <cast_shadows>false</cast_shadows>
+          <pose>1.590 3.000 0.003 0 0 0</pose>
+          <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
         <visual name="soil_tile_3_0">
           <cast_shadows>false</cast_shadows>
           <pose>2.590 -3.000 0.003 0 0 0</pose>
@@ -194,6 +212,12 @@
         <visual name="soil_tile_3_5">
           <cast_shadows>false</cast_shadows>
           <pose>2.590 2.000 0.003 0 0 0</pose>
+          <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="soil_tile_3_6">
+          <cast_shadows>false</cast_shadows>
+          <pose>2.590 3.000 0.003 0 0 0</pose>
           <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
           <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
         </visual>
@@ -233,6 +257,12 @@
           <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
           <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
         </visual>
+        <visual name="soil_tile_4_6">
+          <cast_shadows>false</cast_shadows>
+          <pose>3.590 3.000 0.003 0 0 0</pose>
+          <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
         <visual name="soil_tile_5_0">
           <cast_shadows>false</cast_shadows>
           <pose>4.590 -3.000 0.003 0 0 0</pose>
@@ -266,6 +296,12 @@
         <visual name="soil_tile_5_5">
           <cast_shadows>false</cast_shadows>
           <pose>4.590 2.000 0.003 0 0 0</pose>
+          <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="soil_tile_5_6">
+          <cast_shadows>false</cast_shadows>
+          <pose>4.590 3.000 0.003 0 0 0</pose>
           <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
           <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
         </visual>
@@ -305,6 +341,12 @@
           <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
           <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
         </visual>
+        <visual name="soil_tile_6_6">
+          <cast_shadows>false</cast_shadows>
+          <pose>5.590 3.000 0.003 0 0 0</pose>
+          <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
         <visual name="soil_tile_7_0">
           <cast_shadows>false</cast_shadows>
           <pose>6.590 -3.000 0.003 0 0 0</pose>
@@ -341,6 +383,12 @@
           <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
           <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
         </visual>
+        <visual name="soil_tile_7_6">
+          <cast_shadows>false</cast_shadows>
+          <pose>6.590 3.000 0.003 0 0 0</pose>
+          <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
         <visual name="soil_tile_8_0">
           <cast_shadows>false</cast_shadows>
           <pose>7.590 -3.000 0.003 0 0 0</pose>
@@ -374,6 +422,12 @@
         <visual name="soil_tile_8_5">
           <cast_shadows>false</cast_shadows>
           <pose>7.590 2.000 0.003 0 0 0</pose>
+          <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="soil_tile_8_6">
+          <cast_shadows>false</cast_shadows>
+          <pose>7.590 3.000 0.003 0 0 0</pose>
           <geometry><box><size>1.0 1.0 0.002</size></box></geometry>
           <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/soil_img.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
         </visual>
@@ -2000,9 +2054,549 @@
         </visual>
       </link>
     </model>
+    <model name="tomato_r3_p0">
+      <static>true</static>
+      <pose>0.840 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img22.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img07.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img02.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img22.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img06.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img06.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p1">
+      <static>true</static>
+      <pose>1.340 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img11.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img17.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img09.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img04.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img20.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img15.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p2">
+      <static>true</static>
+      <pose>1.840 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img22.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img06.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img01.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img16.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img22.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img14.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p3">
+      <static>true</static>
+      <pose>2.340 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img19.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img17.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img10.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img21.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img12.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img13.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p4">
+      <static>true</static>
+      <pose>2.840 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img22.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img09.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img05.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img18.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img23.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img01.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p5">
+      <static>true</static>
+      <pose>3.340 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img15.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img24.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img03.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img11.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img24.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img02.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p6">
+      <static>true</static>
+      <pose>3.840 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img18.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img09.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img05.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img08.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img16.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img12.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p7">
+      <static>true</static>
+      <pose>4.340 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img20.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img10.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img22.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img12.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img19.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img21.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p8">
+      <static>true</static>
+      <pose>4.840 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img20.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img05.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img23.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img10.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img13.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img24.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p9">
+      <static>true</static>
+      <pose>5.340 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img14.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img21.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img03.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img01.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img20.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img07.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p10">
+      <static>true</static>
+      <pose>5.840 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img23.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img11.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img06.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img08.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img08.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img21.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tomato_r3_p11">
+      <static>true</static>
+      <pose>6.340 1.500 0 0 0 0</pose>
+      <link name="link">
+        <collision name="foliage_col">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+        </collision>
+        <visual name="foliage_core">
+          <pose>0 0 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.200 1.400</size></box></geometry>
+          <material><ambient>0.1 0.4 0.1 1</ambient><diffuse>0.15 0.55 0.15 1</diffuse></material>
+        </visual>
+        <visual name="foliage_panel_py_0">
+          <pose>0 0.105 0.233 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img15.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_1">
+          <pose>0 0.105 0.700 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img13.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_py_2">
+          <pose>0 0.105 1.167 0 0 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img23.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_0">
+          <pose>0 -0.105 0.233 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img22.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_1">
+          <pose>0 -0.105 0.700 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img19.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+        <visual name="foliage_panel_ny_2">
+          <pose>0 -0.105 1.167 0 3.14159 0</pose>
+          <geometry><box><size>0.480 0.010 0.467</size></box></geometry>
+          <material><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>../media/materials/textures/img14.jpg</albedo_map><metalness>0.0</metalness><roughness>1.0</roughness></metal></pbr></material>
+        </visual>
+      </link>
+    </model>
     <model name="wall_north">
       <static>true</static>
-      <pose>3.590 2.100 1.250 0 0 0</pose>
+      <pose>3.590 3.100 1.250 0 0 0</pose>
       <link name="link">
         <collision name="c"><geometry><box><size>9.030 0.050 2.5</size></box></geometry></collision>
         <visual name="v"><geometry><box><size>9.030 0.050 2.5</size></box></geometry>
@@ -2030,10 +2624,10 @@
     </model>
     <model name="wall_east">
       <static>true</static>
-      <pose>8.080 -0.500 1.250 0 0 0</pose>
+      <pose>8.080 0.000 1.250 0 0 0</pose>
       <link name="link">
-        <collision name="c"><geometry><box><size>0.050 5.250 2.5</size></box></geometry></collision>
-        <visual name="v"><geometry><box><size>0.050 5.250 2.5</size></box></geometry>
+        <collision name="c"><geometry><box><size>0.050 6.250 2.5</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.050 6.250 2.5</size></box></geometry>
           <material>
             <ambient>0.55 0.62 0.65 1</ambient>
             <diffuse>0.78 0.85 0.88 1</diffuse>
@@ -2044,10 +2638,10 @@
     </model>
     <model name="wall_west">
       <static>true</static>
-      <pose>-0.900 -0.500 1.250 0 0 0</pose>
+      <pose>-0.900 0.000 1.250 0 0 0</pose>
       <link name="link">
-        <collision name="c"><geometry><box><size>0.050 5.250 2.5</size></box></geometry></collision>
-        <visual name="v"><geometry><box><size>0.050 5.250 2.5</size></box></geometry>
+        <collision name="c"><geometry><box><size>0.050 6.250 2.5</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.050 6.250 2.5</size></box></geometry>
           <material>
             <ambient>0.55 0.62 0.65 1</ambient>
             <diffuse>0.78 0.85 0.88 1</diffuse>

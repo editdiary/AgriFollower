@@ -13,8 +13,8 @@
 
 [ 시나리오 확장 구조 (전략 패턴) ]
 - GaitStrategy 를 상속한 클래스가 "이번 틱의 속도"를 결정한다.
-- 현재는 시나리오 1(ConstantWalk: 정속 왕복)만 구현.
-- 시나리오 2(Stop&Go)·3(후진 접근)·4(지그재그)·5(U턴)는 같은 인터페이스로
+- 시나리오 1(ConstantWalk: 정속 왕복)·2(StopGo: 작물 단위 stop-and-go) 구현.
+- 시나리오 3(후진 접근)·4(지그재그)·5(U턴)는 같은 인터페이스로
   클래스를 추가하고 STRATEGIES 딕셔너리에 등록하면 된다.
 
 [ 에피소드 리셋 연동 ]
@@ -23,6 +23,7 @@
 """
 
 import math
+import random
 
 import rclpy
 from rclpy.node import Node
@@ -56,7 +57,7 @@ class ConstantWalk(GaitStrategy):
     반대 방향으로 돌아 걸어온다(왕복).
     """
 
-    def __init__(self, speed, x_min, x_max):
+    def __init__(self, speed, x_min, x_max, **_):
         self.speed = speed       # [m/s] 보행 속도
         self.x_min = x_min       # [m] 왕복 구간 시작
         self.x_max = x_max       # [m] 왕복 구간 끝
@@ -74,10 +75,61 @@ class ConstantWalk(GaitStrategy):
         return (self.direction * self.speed, 0.0)
 
 
+class StopGo(GaitStrategy):
+    """시나리오 2 — 수확 모사 (Stop & Go, rl_train_scenarios.md §2.5).
+
+    작물 한 칸(step_distance)만큼 일정 속도로 걸어가 멈춰 '작업'하고(랜덤 시간),
+    다시 다음 칸으로 이동하기를 반복한다. 통로 끝(x_max/x_min)에 닿으면 방향 반전.
+    걷는 속도는 일정하고 멈춤(작업) 시간만 무작위 → 설계 §2의 '무작위 간격 정지'.
+    """
+
+    def __init__(self, speed, x_min, x_max, *, step_distance, stop_time_range, rng, **_):
+        self.speed = speed                          # [m/s] walk 구간 속도 (일정)
+        self.x_min = x_min
+        self.x_max = x_max
+        self.step_distance = step_distance          # [m] 한 번에 이동할 거리 (= 작물 간격)
+        self.stop_min, self.stop_max = stop_time_range   # [s] 작업(멈춤) 시간 랜덤 범위
+        self.rng = rng                              # 멈춤 시간 샘플용 RNG (노드 소유)
+        self.reset()
+
+    def reset(self):
+        self.direction = +1.0
+        self.state = 'walk'          # 'walk'(이동) | 'stop'(작업)
+        self.walked = 0.0            # 현재 walk 구간 누적 이동거리 [m]
+        self.stop_elapsed = 0.0      # 현재 stop 구간 경과 시간 [s]
+        self.stop_target = 0.0       # 이번 stop 의 목표 작업 시간 [s]
+
+    def compute(self, x, y, dt):
+        # --- 작업 중(정지) ---
+        if self.state == 'stop':
+            self.stop_elapsed += dt
+            if self.stop_elapsed >= self.stop_target:
+                self.state = 'walk'      # 작업 끝 → 다음 칸으로 이동 시작
+                self.walked = 0.0
+            return (0.0, 0.0)
+
+        # --- 이동 중(walk) ---
+        # 통로 끝에 도달하면 방향 반전 (ConstantWalk 과 동일)
+        if self.direction > 0 and x >= self.x_max:
+            self.direction = -1.0
+        elif self.direction < 0 and x <= self.x_min:
+            self.direction = +1.0
+
+        self.walked += self.speed * dt
+        if self.walked >= self.step_distance:
+            # 한 칸 도달 → 멈춰서 작업 (작업 시간 무작위 샘플)
+            self.state = 'stop'
+            self.stop_elapsed = 0.0
+            self.stop_target = self.rng.uniform(self.stop_min, self.stop_max)
+            return (0.0, 0.0)
+        return (self.direction * self.speed, 0.0)
+
+
 # 시나리오 번호 → 전략 클래스 매핑. 새 시나리오는 여기에 등록.
-#   2: StopGo, 3: Backtrack, 4: Zigzag, 5: UTurn (추후 구현)
+#   3: Backtrack, 4: Zigzag, 5: UTurn (추후 구현)
 STRATEGIES = {
     1: ConstantWalk,
+    2: StopGo,
 }
 
 
@@ -98,6 +150,11 @@ class WorkerController(Node):
         self.declare_parameter('aisle_x_max', 6.3)   # [m]
         self.declare_parameter('reset_x', 1.5)       # [m] 에피소드 시작 위치
         self.declare_parameter('reset_y', 0.0)
+        # StopGo(시나리오 2) 전용 — 다른 시나리오에서는 무시됨
+        self.declare_parameter('step_distance', 0.5)  # [m] 한 번 이동 거리 (작물 간격)
+        self.declare_parameter('stop_time_min', 3.0)  # [s] 작업(멈춤) 시간 하한
+        self.declare_parameter('stop_time_max', 6.0)  # [s] 작업(멈춤) 시간 상한
+        self.declare_parameter('seed', -1)            # <0 비결정(에피소드마다 다른 패턴), ≥0 재현
 
         scenario = self.get_parameter('scenario').value
         speed = self.get_parameter('speed').value
@@ -109,7 +166,15 @@ class WorkerController(Node):
         if scenario not in STRATEGIES:
             raise ValueError(f'시나리오 {scenario} 은(는) 아직 구현되지 않음. '
                              f'가능: {list(STRATEGIES)}')
-        self.gait = STRATEGIES[scenario](speed, x_min, x_max)
+        # 멈춤 시간 무작위화용 RNG — reset() 에서 재시드하지 않아 에피소드마다 패턴이 달라짐.
+        seed = self.get_parameter('seed').value
+        self.rng = random.Random(None if seed < 0 else seed)
+        self.gait = STRATEGIES[scenario](
+            speed, x_min, x_max,
+            step_distance=self.get_parameter('step_distance').value,
+            stop_time_range=(self.get_parameter('stop_time_min').value,
+                             self.get_parameter('stop_time_max').value),
+            rng=self.rng)
 
         # 내부 키네마틱 상태 — 이 값이 작업자 위치의 단일 출처
         self.x = self.reset_x

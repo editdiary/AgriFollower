@@ -24,7 +24,8 @@ from glob import glob
 
 # ---- 레이아웃 파라미터 (RL/실험 시 여기만 조정) ----
 RANDOM_SEED = 0       # 작물 면 텍스처 랜덤 배치 시드 (재현성). 이미지 집합 바뀌면 배치도 바뀜.
-NUM_ROWS = 3          # 식물 줄 개수 (y 방향으로 늘어섬)
+NUM_ROWS = 4          # 식물 줄 개수 (y 방향으로 늘어섬). 짝수 → 중앙 통로가 y=0
+                      #   (로봇/타겟 reset_y=0 과 일치). 4열 → 통로 3개(y=-1/0/+1)
 PLANTS_PER_ROW = 12   # 줄당 식물 수 (x 방향으로 늘어섬)
 PLANT_SPACING_X = 0.5  # 같은 줄 내 식물 간격 [m]
 AISLE_WIDTH = 0.8      # 인접한 줄의 잎 면 사이 실제 통로 폭 [m]
@@ -240,7 +241,7 @@ def build_world(image_names, lay):
 
     <physics name="default_physics" type="ignored">
       <max_step_size>0.001</max_step_size>
-      <real_time_factor>1.0</real_time_factor>
+      <real_time_factor>0</real_time_factor>
     </physics>
     <plugin filename="ignition-gazebo-physics-system"
             name="ignition::gazebo::systems::Physics"></plugin>

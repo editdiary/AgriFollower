@@ -7,6 +7,41 @@
 
 ---
 
+## 학습 처리량이 실시간(RTF≈1.0)에 묶임 — Fortress 는 `real_time_factor` 만 유효 (해결, 2026-06-08)
+
+**증상**
+headless 로 돌려도 학습이 ~8fps(RTF≈1.0)에서 더 안 빨라짐. 그런데 서버 자원은 **CPU<10%·GPU<25%로 남아돎** —
+연산 포화처럼 보이지 않는데도 속도가 안 오름.
+
+**배경**
+world physics 가 `<real_time_factor>1.0</real_time_factor>` 로 실시간에 묶여 있었다. env 는 step 당
+sim 0.1초를 `_sleep_sim` 으로 대기(`control.rate_hz=10`)하므로, RTF=1.0이면 wall 기준 최대 10fps 가 천장.
+
+**원인**
+real-time **throttle**. gz-sim SimulationRunner 가 `updatePeriod = max_step_size / real_time_factor` 로
+목표 스텝 주기를 잡고, 물리를 일찍 끝낸 뒤 **남는 시간을 sleep** 한다 → 자원이 노는 건 연산 포화가 아니라
+"빨리 끝내고 일부러 기다리는" 상태. RTF 가 1.0 *아래*가 아니라 정확히 1.0에 붙어 있던 게 throttle 의 신호.
+
+**진단(요약)**
+- 1차로 `<real_time_update_rate>0</real_time_update_rate>` 추가 → **무효**(RTF 그대로 1.0). 이유: 그건
+  **Gazebo Classic 전용 태그**라 Fortress 의 SimulationRunner 가 읽지 않는다.
+- gz-sim `ign-gazebo6/src/SimulationRunner.cc` 확인: `desiredRtf = physics->RealTimeFactor()`,
+  `updatePeriod = stepSize / desiredRtf`, 그리고 **`if (desiredRtf < 1e-9) updatePeriod = 0`**(→ throttle 해제).
+  즉 Fortress 의 노브는 `real_time_factor` 뿐이고, `0`이 "가능한 한 빠르게".
+
+**해결**
+physics 의 `<real_time_factor>` 를 `1.0` → **`0`**(무제한)으로. `greenhouse.sdf` 와 생성기
+`gen_greenhouse_world.py` **양쪽** 수정(한쪽만 고치면 world 재생성 때 되돌아감). 1차 시도의
+`real_time_update_rate` 라인은 제거. `--symlink-install` 이라 재빌드 불필요 — 런치 재시작만.
+(무제한이 불안정하면 유한값 `5`~`10` 으로 캡 가능.)
+
+**검증**
+`ign topic -e -t /stats` 의 `real_time_factor` 가 1.0 → **1~5x 로 상승**(센서 렌더 버스트·GPU 경합으로
+출렁이는 건 정상 — 순간값 말고 평균 fps 로 판단). 학습 fps 동반 상승. 거동·학습 데이터는 `_sleep_sim` 이
+sim-time 기준이라 RTF 가 변해도 불변(상세: `rl_code_guide.md` §검증·보정 4).
+
+---
+
 ## `robot_state_publisher` "Moved backwards in time" 경고 폭주 (해결, 2026-06-05)
 
 **증상**
