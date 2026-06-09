@@ -253,6 +253,19 @@ pandas 자유 분석: `pd.read_csv('rl_logs/monitor_sac_2.csv', skiprows=1)`
 - 종반 클러스터 1057~1198 스텝 = **타겟 회차 시점**(0.05 m/s × 5.7 m ≈ step 1140)에 집중
   → 충돌 시점 분포를 보면 "어느 기동이 약한지"를 영상 없이 특정할 수 있다.
 
+### 어느 체크포인트를 고르나 — `final ≠ best`
+
+학습이 끝났다고 마지막 모델(`sac_follow_final.zip`)이 최적인 건 아니다. RL은 후반에
+**열화(late-training degradation)** 가 흔하다 — 정점을 찍은 뒤 성공률·리턴이 도로 내려간다
+(sac_1 실측: reward 정점 ~670k step에서 성공 88% → final 800k에서 70%, lost율 15%로 악화).
+따라서 **중간 체크포인트가 final보다 나을 수 있으므로 반드시 비교 평가**한다.
+
+선정 절차(명령은 `runbook.md` §6-1):
+1. **`analyze_log`** (sim 불필요) — TB 곡선으로 정점 구간·후반 열화를 진단하고 후보 ckpt를 추천.
+   ⚠️ 학습 로그는 stochastic·롤링윈도라 **reward를 1차 신호**로 (resume 직후 success "100%"는 윈도 아티팩트).
+2. **`eval_sweep`** — 추천 후보 소수만 deterministic 평가해 성공률→리턴 순으로 랭킹.
+3. **육안 검증** — 1~2위를 GUI로 확인(아래 "꼼수 의심 거동") 후 확정.
+
 ## 5. 주의사항·함정 (검증 중 실제로 발견된 것 포함)
 
 1. **매카넘 y축 반전 (실측 버그 보정):** 벤더 MecanumDrive 플러그인이 `linear.y` 를

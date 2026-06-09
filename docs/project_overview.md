@@ -95,6 +95,8 @@ Ignition Gazebo 온실에서 정책을 학습하고 검증한다.
 | `target_feature_node.py` | `/target/features` 발행 — **Sim-to-Real 시 유일한 교체 지점** (§7) |
 | `train_sac.py` | SB3 학습 드라이버 — `--algo sac/ppo`, 체크포인트+리플레이버퍼 저장, `--resume`/`--warm-start` |
 | `eval_policy.py` | deterministic 평가 — 3지표 + 스텝별 CSV 덤프 |
+| `eval_sweep.py` | 여러 체크포인트 일괄 deterministic 평가·랭킹 (성공률→리턴, 비교 CSV) |
+| `analyze_log.py` | TB 로그로 정점·후반열화 진단 → 평가 후보 ckpt 추천 (sim 불필요, 모델 선정 1단계) |
 | `callbacks.py` | TensorBoard 진단 지표 (종료사유 분포·보상 분해·행동 통계) |
 | `config/rl_params.yaml` | 모든 튜너블의 단일 출처 (계수 의미·튜닝 가이드는 `rl_code_guide.md` §3) |
 
@@ -190,6 +192,10 @@ sac_1 평가 CSV(스텝별 보상 분해·raw 센서 거리)로 원인을 특정
 2. **주행 부드러움**: ω 변화량 표준편차 + 거리 유지 품질 (밴드 점유율, d_t σ)
 3. **노이즈 강건성**: 관측 노이즈를 3%→30%로 올렸을 때 실패율 변화
 
+**최적 모델 선정 (2단계 — `final ≠ best`, 후반 열화 흔함):** ① `analyze_log`로 TB 곡선에서
+정점 구간·후반 열화를 진단해 후보 ckpt 추천(sim 불필요) → ② `eval_sweep`로 후보만 deterministic
+평가·랭킹 → ③ 1~2위 육안 검증 후 확정. 절차·소요시간·체크리스트는 `runbook.md` §6-1.
+
 **현재 가용한 결과** (sac_2 기준):
 
 - sac_2 학습 거동: 종료 사유가 lost+stuck → env_collision → success 순으로 천이 (교과서적
@@ -230,6 +236,8 @@ sac_1 평가 CSV(스텝별 보상 분해·raw 센서 거리)로 원인을 특정
 
 ### 📌 갱신 체크리스트 (학습 진행에 따라)
 
+- [ ] **학습 완료 시 (모델 선정)**: `analyze_log`로 후보 추림 → `eval_sweep`로 확정 → 육안 검증
+  → 확정 ckpt를 `best_*.zip`로 보관 (2단계 절차·시간·체크리스트는 `runbook.md` §6-1)
 - [ ] **sac_3 완료 시**: §5.0 표 sac_3 행, §5.3 최종 결과, §6 비교표 sac_3 열 채우기
   (eval_policy 결과 + monitor CSV 분석 — 절차는 `runbook.md` §4·§6)
 - [ ] **PPO 런 후**: §5.4, §6 비교표 ppo_1 열, §7 결론의 SAC vs PPO 비교 서술

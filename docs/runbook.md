@@ -159,7 +159,7 @@ tensorboard --logdir ~/rosorin_sim_ws/rl_logs --bind_all
 tail -30 ~/rosorin_sim_ws/rl_logs/monitor_sac_2.csv
 # 컬럼: r(리턴), l(길이), t(경과초), terminal(종료사유: success/lost/env_collision/target_collision/stuck)
 
-# ③ 정량 평가 + 거동 육안 확인 (→ §6)
+# ③ 어느 체크포인트가 최적인지 선정 + 거동 육안 확인 (→ §6-1: analyze_log 사전선별 → eval_sweep 확정)
 ```
 
 **TensorBoard에서 보는 순서** (상세는 [`rl_code_guide.md`](rl_code_guide.md) §4):
@@ -283,8 +283,63 @@ ros2 run rosorin_rl eval_policy \
     --config /tmp/rl_params_noise03.yaml --episodes 10
 ```
 
+### 6-1. 최적 체크포인트 고르기 — 2단계 (로그 사전선별 → 소수 확정평가)
+
+체크포인트 수십 개를 전부 sim 평가하는 건 비싸다. **① 학습 로그로 후보를 좁히고(no sim)
+→ ② 소수만 deterministic 평가** 하는 2단계가 빠르고 정확하다.
+
+**Stage 0 — `analyze_log` 로 후보 추천 (수 초, sim 불필요)**
+
+```bash
+ros2 run rosorin_rl analyze_log \
+    --logdir rl_logs/sac_1 \
+    --models-dir src/rosorin_rl/models/1_main-train_sac1 --top 4 --min-step 300000
+```
+- step별 success/reward/실패율 곡선 + **정점 구간·후반 열화 진단**을 출력한다.
+- **reward 1차·success 2차**로 후보 N개(정점 구간 + 최신 ckpt)를 골라 바로 붙여넣을
+  `eval_sweep --models ...` 명령을 생성한다. `--min-step` 은 미수렴 초반을 표에서 숨길 뿐.
+
+> ⚠️ **학습 로그(monitor·TB)는 탐색(stochastic)·rolling window 통계라 그것만으로 고르면 안 된다.**
+> 특히 resume 직후 success_rate 가 일시적으로 "100%" 로 보이는 건 윈도 아티팩트(같은 구간 reward 가
+> 낮으면 가짜) → **후보 랭킹은 reward 우선**. 사전선별일 뿐 최종 선정은 Stage 1 이 한다.
+
+**Stage 1 — `eval_sweep` 로 후보만 deterministic 평가·랭킹 (sim 필요)**
+
+`eval_sweep` 은 후보들을 **한 sim 연결로 순차 deterministic 평가**해 비교 CSV +
+정렬된 랭킹 표를 출력한다 (성공률 → 평균 리턴 순, 1위 `★`).
+
+```bash
+# 터미널 1: sim (headless 권장 — 빠름)
+ros2 launch rosorin_rl rl_sim.launch.py headless:=true
+
+# 터미널 2: Stage 0 이 출력한 명령을 그대로 실행 (후보 4개 → 30ep 권장)
+ros2 run rosorin_rl eval_sweep \
+    --models <Stage 0 가 추천한 .zip 4개> \
+    --episodes 30 --out rl_logs/eval_sweep_sac1.csv
+#   후반 ckpt(800k)도 포함해 로그의 "후반 열화" 신호를 deterministic 으로 교차검증한다.
+#   직접 넓게 보고 싶으면 --glob "...sac_follow_[4-8][05]0000_steps.zip" 로 50k 간격 스윕도 가능.
+```
+
+**소요 시간** — sim은 uncapped RTF(`real_time_factor=0`)지만 RGB-D 렌더링 병목으로 **~20 steps/s**
+(학습 실측 19 steps/s). 1 에피소드(최대 1500스텝=150초 sim) ≈ **벽시계 75~80초**.
+- 4 모델 × 30ep(=120 에피소드) ≈ **1.5~2.5시간**, × 20ep ≈ 1~1.7시간.
+- 💡 **먼저 보정:** `eval_policy --model <후보> --episodes 2` 로 1 에피소드 벽시계를 재고 ×120 으로
+  전체를 예측. 너무 길면 `--episodes 20` 으로 낮춰도 차이 식별엔 충분.
+
+**Stage 2 — 랭킹 상위 육안 검증 후 확정 (필수)**
+
 > 💡 곡선·지표가 좋아도 **거동 육안 확인은 필수** — 제자리 진동 같은 꼼수(reward hacking)는
 > 숫자만으론 안 보인다 (`rl_code_guide.md` §4 "꼼수 의심 거동").
+> → 랭킹 1~2위만 GUI(§6 상단 `rl_sim.launch.py` headless 없이)로 `eval_policy --episodes 5` 관찰 후 확정.
+
+**최종 확정 체크리스트** — 표 1위를 바로 확정하지 말고 다음을 거친다:
+1. **육안 검증 통과** — 위 GUI 관찰에서 추종 거동이 자연스럽고 reward hacking 없음.
+2. **박빙이면 숫자에 과적합 금지** — 30ep에서 27/30 vs 26/30 차이는 통계적으로 무의미할 수 있음.
+   이럴 땐 부차 지표(**밴드 점유율↑ / d_t σ↓ / ω 부드러움↓**)가 나은 쪽을 택한다.
+3. **(선택) 배포 전 노이즈 강건성 1회** — 1위만 `--config` 로 noise 0.3 재평가(위 §6 노이즈 예시).
+4. **확정 모델 보관** — 고른 `.zip` 을 명확한 이름으로 복사:
+   `cp .../sac_follow_670000_steps.zip src/rosorin_rl/models/1_main-train_sac1/best_sac1.zip`
+   → 이후 PPO 비교·보고서에서 이 파일을 참조.
 
 ---
 

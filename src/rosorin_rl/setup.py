@@ -32,6 +32,8 @@ setup(
             'target_feature = rosorin_rl.target_feature_node:main',
             'train_sac = rosorin_rl.train_sac:main',
             'eval_policy = rosorin_rl.eval_policy:main',
+            'eval_sweep = rosorin_rl.eval_sweep:main',
+            'analyze_log = rosorin_rl.analyze_log:main',
         ],
     },
 )
