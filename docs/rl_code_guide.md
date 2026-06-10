@@ -222,11 +222,12 @@ tensorboard --logdir ~/rosorin_sim_ws/rl_logs   # http://localhost:6006
 > 과거가 섞여 보인다 (sac_2 실측: TB env_collision_rate 0.46 vs 실제 최근 50ep 는 0.22).
 > "지금" 상태 판단은 `monitor.csv` 꼬리 구간이 ground truth.
 
-### 에피소드 CSV (`rl_logs/monitor_{algo}_{N}.csv`)
+### 에피소드 CSV (`rl_logs/monitor_{algo}_{N}.monitor.csv`)
 `Monitor(filename=...)` 가 에피소드별 `(r=리턴, l=길이, t=경과초, terminal=종료사유)` 를 기록.
-파일명의 `N` 은 TB 런 번호(`sac_N`)와 일치 (7차: 고정 경로 `monitor.csv` 는 다음 학습
-시작 시 truncate 로 소실되던 문제 수정. resume 런은 `_resumeN` 접미사로 분리).
-pandas 자유 분석: `pd.read_csv('rl_logs/monitor_sac_2.csv', skiprows=1)`
+파일명의 `N` 은 TB 런 번호(`sac_N`)와 일치. resume 런은 `override_existing=False` 로
+같은 파일에 헤더 없이 **이어붙인다**(append). 새 런만 truncate 로 새 CSV 를 만든다.
+(주의: append 후 `t`(경과초)는 resume 경계에서 ~0 으로 재시작 — 세션별 상대값.)
+pandas 자유 분석: `pd.read_csv('rl_logs/monitor_sac_2.monitor.csv', skiprows=1)`
 
 **꼼수(Reward Hacking) 의심 거동** — 곡선만 좋고 실제 거동이 이상할 때:
 - 제자리 진동으로 추종 보상만 수집 → `stuck` 종료가 잡아주는지 확인 (`terminal` 분포 로깅)

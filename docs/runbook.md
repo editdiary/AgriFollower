@@ -147,7 +147,7 @@ ros2 topic list                        # 전체 토픽 목록
 | 최종 리플레이 버퍼 | `{modeldir}/sac_follow_final_replay_buffer.pkl` | ~120MB, resume용 |
 | 중간 체크포인트 | `{modeldir}/sac_follow_{N}_steps.zip` (+ `..._replay_buffer_{N}_steps.pkl`) | 10k 스텝마다 |
 | TensorBoard 로그 | `rl_logs/sac_N/events.out.tfevents.*` | **학습 종료 후에도 영구 보존** |
-| 에피소드 CSV | `rl_logs/monitor_sac_N.csv` | 에피소드별 리턴/길이/종료사유 |
+| 에피소드 CSV | `rl_logs/monitor_sac_N.monitor.csv` | 에피소드별 리턴/길이/종료사유 |
 
 ### 4-2. 확인 순서 (권장 루틴)
 
@@ -156,7 +156,7 @@ ros2 topic list                        # 전체 토픽 목록
 tensorboard --logdir ~/rosorin_sim_ws/rl_logs --bind_all
 
 # ② 에피소드 CSV 꼬리 확인 — "마지막엔 어떻게 죽었나"의 ground truth
-tail -30 ~/rosorin_sim_ws/rl_logs/monitor_sac_2.csv
+tail -30 ~/rosorin_sim_ws/rl_logs/monitor_sac_2.monitor.csv
 # 컬럼: r(리턴), l(길이), t(경과초), terminal(종료사유: success/lost/env_collision/target_collision/stuck)
 
 # ③ 어느 체크포인트가 최적인지 선정 + 거동 육안 확인 (→ §6-1: analyze_log 사전선별 → eval_sweep 확정)
@@ -177,7 +177,7 @@ pandas 분석 예시:
 
 ```python
 import pandas as pd
-df = pd.read_csv('~/rosorin_sim_ws/rl_logs/monitor_sac_2.csv', skiprows=1)
+df = pd.read_csv('~/rosorin_sim_ws/rl_logs/monitor_sac_2.monitor.csv', skiprows=1)
 print(df.tail(50)['terminal'].value_counts())   # 최근 50 에피소드 종료사유 분포
 ```
 
